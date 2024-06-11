@@ -138,3 +138,10 @@ public class AuthService : IAuthService
 
 		return refreshToken;
 	}
+
+	public DateTime ConvertUtcToBrasilTime(DateTime utcDateTime)
+	{
+		var brTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+		return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, brTimeZone);
+	}
+}
