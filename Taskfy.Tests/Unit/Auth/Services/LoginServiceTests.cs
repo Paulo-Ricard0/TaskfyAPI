@@ -7,6 +7,7 @@ using NSubstitute;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
 using Taskfy.API.Models;
 using Taskfy.API.Services.Auth;
@@ -78,6 +79,42 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
 			return token;
+		}
+
+		[Fact]
+		public async Task DeveRetornar401Unauthorized_QuandoCredenciaisInvalidas()
+		{
+			// Arrange
+			var usuarioModel = new LoginModelDTO
+			{
+				Email = "test@gmail.com",
+				Password = "Test123@"
+			};
+
+			var usuario = new Usuario
+			{
+				Email = "test@gmail.com",
+				UserName = "testuser",
+			};
+
+			var userManager = Substitute.For<UserManager<Usuario>>(
+				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
+
+			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(null));
+			userManager.CheckPasswordAsync(usuario, usuarioModel.Password).Returns(Task.FromResult(false));
+
+			var configuration = Substitute.For<IConfiguration>();
+			var mockTokenService = Substitute.For<ITokenService>();
+			var authService = new AuthService(userManager, configuration, mockTokenService);
+
+			// Act
+			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
+
+			// Assert
+			resultado.Should().NotBeNull();
+			resultado.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+			resultado.Status.Should().Be("Erro");
+			resultado.Message.Should().Be("Email ou senha incorretos.");
 		}
 	}
 }
