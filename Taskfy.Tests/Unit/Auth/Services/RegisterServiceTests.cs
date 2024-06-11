@@ -12,7 +12,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 	public class RegisterServiceTests
 	{
 		[Fact]
-		public async Task Registra_QuandoUsuarioNaoExiste_CriaUsuarioComSucesso()
+		public async Task QuandoUsuarioNaoExiste_CriaUsuarioComSucesso201Created()
 		{
 			// Arrange
 			var usuarioModel = new RegistroModelDTO
