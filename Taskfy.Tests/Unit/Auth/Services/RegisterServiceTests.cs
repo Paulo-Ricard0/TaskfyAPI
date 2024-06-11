@@ -78,7 +78,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			// Arrange
 			var usuarioModel = new RegistroModelDTO
 			{
-				UserName = "testuse",
+				UserName = "testuser",
 				Email = "test@gmail.com",
 				Password = "Test123@"
 			};
