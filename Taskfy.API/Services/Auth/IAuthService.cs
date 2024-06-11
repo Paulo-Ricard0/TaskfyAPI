@@ -11,6 +11,5 @@ namespace Taskfy.API.Services.Auth
 		Task<ResponseDTO> LoginAsync(LoginModelDTO usuarioModel);
 		Task<List<Claim>> GetAuthClaims(Usuario usuario);
 		string GenerateRefreshToken();
-		DateTime ConvertUtcToBrasilTime(DateTime utcDateTime);
 	}
 }
