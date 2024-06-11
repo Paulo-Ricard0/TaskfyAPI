@@ -33,17 +33,14 @@ public class AuthController : ControllerBase
 
 	[HttpPost]
 	[Route("login")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(ResponseLoginTokenDTO), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status401Unauthorized)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> Login([FromBody] LoginModelDTO usuarioModel)
 	{
-		var usuarioToken = await _authService.LoginAsync(usuarioModel);
+		var responseToken = await _authService.LoginAsync(usuarioModel);
 
-		if (usuarioToken == null)
-			return Unauthorized(new ResponseDTO { Status = "Erro", Message = "Não autorizado." });
-
-		return Ok(usuarioToken);
+		return StatusCode(responseToken.StatusCode, responseToken);
 	}
 }
