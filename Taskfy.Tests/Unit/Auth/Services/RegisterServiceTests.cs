@@ -40,10 +40,35 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			resultado.Message.Should().Be("Usuário criado com sucesso!");
 		}
 
+		[Fact]
+		public async Task QuandoUsuarioExistir_Retorna_409Conflict()
+		{
+			// Arrange
+			var UsuarioExistente = new Usuario { Email = "test@gmail.com" };
+
+			var usuarioModel = new RegistroModelDTO
+			{
+				UserName = "testuser",
+				Email = "test@gmail.com",
+				Password = "Test123@"
+			};
+
+			var userManager = Substitute.For<UserManager<Usuario>>(
+				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
+
+			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(UsuarioExistente));
+
+			var configuration = Substitute.For<IConfiguration>();
+			var authService = new AuthService(userManager, configuration);
+
+			// Act
+			var resultado = await authService.RegisterAsync(usuarioModel);
+
 			// Assert
-			result.StatusCode.Should().Be(StatusCodes.Status201Created);
-			result.Status.Should().Be("Sucesso");
-			result.Message.Should().Be("Usuário criado com sucesso!");
+			resultado.Status.Should().Be("Erro");
+			resultado.Message.Should().Be("Usuário já registrado!");
+			resultado.StatusCode.Should().Be(StatusCodes.Status409Conflict);
+		}
 		}
 	}
 }
