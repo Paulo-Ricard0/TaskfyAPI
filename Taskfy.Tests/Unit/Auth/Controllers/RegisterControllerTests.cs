@@ -7,104 +7,103 @@ using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
 using Taskfy.API.Services.Auth;
 
-namespace Taskfy.Tests.Unit.Auth.Controllers
+namespace Taskfy.Tests.Unit.Auth.Controllers;
+
+public class RegisterControllerTests
 {
-	public class RegisterControllerTests
+	[Fact]
+	public async Task Verifica_UsuarioCriado_Retorna201CreatedStatusCode()
 	{
-		[Fact]
-		public async Task Verifica_UsuarioCriado_Retorna201CreatedStatusCode()
+		// Arrange
+		var usuarioModel = new RegistroModelDTO
 		{
-			// Arrange
-			var usuarioModel = new RegistroModelDTO
-			{
-				UserName = "testuser",
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			UserName = "testuser",
+			Email = "test@gmail.com",
+			Password = "Test123@"
+		};
 
-			var responseDto = new ResponseDTO
-			{
-				Status = "Sucesso",
-				Message = "Usuário criado com sucesso!",
-				StatusCode = StatusCodes.Status201Created
-			};
-
-			var authService = Substitute.For<IAuthService>();
-			authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
-
-			var controller = new AuthController(authService);
-
-			// Act
-			var resultado = await controller.Register(usuarioModel) as ObjectResult;
-
-			// Assert
-			resultado.Should().NotBeNull();
-			resultado.StatusCode.Should().Be(StatusCodes.Status201Created);
-			resultado.Value.Should().BeEquivalentTo(responseDto);
-		}
-
-		[Fact]
-		public async Task Verifica_Retorno409Conflict_QuandoUsuarioExistir()
+		var responseDto = new ResponseDTO
 		{
-			// Arrange
-			var usuarioModel = new RegistroModelDTO
-			{
-				UserName = "testuser",
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			Status = "Sucesso",
+			Message = "Usuário criado com sucesso!",
+			StatusCode = StatusCodes.Status201Created
+		};
 
-			var responseDto = new ResponseDTO
-			{
-				Status = "Erro",
-				Message = "Usuário já registrado!",
-				StatusCode = StatusCodes.Status409Conflict
-			};
+		var authService = Substitute.For<IAuthService>();
+		authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
 
-			var authService = Substitute.For<IAuthService>();
-			authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
+		var controller = new AuthController(authService);
 
-			var controller = new AuthController(authService);
+		// Act
+		var resultado = await controller.Register(usuarioModel) as ObjectResult;
 
-			// Act
-			var resultado = await controller.Register(usuarioModel) as ObjectResult;
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado.StatusCode.Should().Be(StatusCodes.Status201Created);
+		resultado.Value.Should().BeEquivalentTo(responseDto);
+	}
 
-			// Assert
-			resultado.Should().NotBeNull();
-			resultado.StatusCode.Should().Be(StatusCodes.Status409Conflict);
-			resultado.Value.Should().BeEquivalentTo(responseDto);
-		}
-
-		[Fact]
-		public async Task Verifica_Retorno500_QuandoErroInternoOcorre()
+	[Fact]
+	public async Task Verifica_Retorno409Conflict_QuandoUsuarioExistir()
+	{
+		// Arrange
+		var usuarioModel = new RegistroModelDTO
 		{
-			// Arrange
-			var usuarioModel = new RegistroModelDTO
-			{
-				UserName = "testuser",
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			UserName = "testuser",
+			Email = "test@gmail.com",
+			Password = "Test123@"
+		};
 
-			var responseDto = new ResponseDTO
-			{
-				Status = "Erro",
-				Message = "Falha na criação de usuário.",
-				StatusCode = StatusCodes.Status500InternalServerError
-			};
+		var responseDto = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Usuário já registrado!",
+			StatusCode = StatusCodes.Status409Conflict
+		};
 
-			var authService = Substitute.For<IAuthService>();
-			authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
+		var authService = Substitute.For<IAuthService>();
+		authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
 
-			var controller = new AuthController(authService);
+		var controller = new AuthController(authService);
 
-			// Act
-			var resultado = await controller.Register(usuarioModel) as ObjectResult;
+		// Act
+		var resultado = await controller.Register(usuarioModel) as ObjectResult;
 
-			// Assert
-			resultado.Should().NotBeNull();
-			resultado.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-			resultado.Value.Should().BeEquivalentTo(responseDto);
-		}
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado.StatusCode.Should().Be(StatusCodes.Status409Conflict);
+		resultado.Value.Should().BeEquivalentTo(responseDto);
+	}
+
+	[Fact]
+	public async Task Verifica_Retorno500_QuandoErroInternoOcorre()
+	{
+		// Arrange
+		var usuarioModel = new RegistroModelDTO
+		{
+			UserName = "testuser",
+			Email = "test@gmail.com",
+			Password = "Test123@"
+		};
+
+		var responseDto = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Falha na criação de usuário.",
+			StatusCode = StatusCodes.Status500InternalServerError
+		};
+
+		var authService = Substitute.For<IAuthService>();
+		authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
+
+		var controller = new AuthController(authService);
+
+		// Act
+		var resultado = await controller.Register(usuarioModel) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		resultado.Value.Should().BeEquivalentTo(responseDto);
 	}
 }
