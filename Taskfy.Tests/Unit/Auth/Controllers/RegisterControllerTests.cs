@@ -35,7 +35,13 @@ namespace Taskfy.Tests.Unit.Auth.Controllers
 			var controller = new AuthController(authService);
 
 			// Act
-			var result = await controller.Register(usuarioModel) as ObjectResult;
+			var resultado = await controller.Register(usuarioModel) as ObjectResult;
+
+			// Assert
+			resultado.Should().NotBeNull();
+			resultado.StatusCode.Should().Be(StatusCodes.Status201Created);
+			resultado.Value.Should().BeEquivalentTo(responseDto);
+		}
 
 			// Assert
 			result.Should().NotBeNull();
