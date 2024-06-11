@@ -6,4 +6,5 @@ namespace Taskfy.API.Services.Auth;
 public interface ITokenService
 {
 	JwtSecurityToken GenerateAccessToken(IEnumerable<Claim> claims, IConfiguration _config);
+	DateTime ConvertUtcToBrasilTime(DateTime utcDateTime);
 };
