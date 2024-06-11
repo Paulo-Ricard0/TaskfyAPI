@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
 using Taskfy.API.Models;
@@ -80,3 +81,20 @@ public class AuthService : IAuthService
 			Expiration = token.ValidTo
 		};
 	}
+
+	// Funções auxiliares
+	public async Task<List<Claim>> GetAuthClaims(Usuario usuario)
+	{
+		var userRoles = await _userManager.GetRolesAsync(usuario);
+
+		var authClaims = new List<Claim>
+	{
+		new Claim(ClaimTypes.Name, usuario.UserName!),
+		new Claim(ClaimTypes.Email, usuario.Email!),
+		new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+	};
+
+		authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+		return authClaims;
+	}
+
