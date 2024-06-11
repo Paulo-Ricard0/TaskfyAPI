@@ -14,11 +14,13 @@ public class AuthService : IAuthService
 {
 	private readonly UserManager<Usuario> _userManager;
 	private readonly IConfiguration _configuration;
+	private readonly ITokenService _tokenService;
 
-	public AuthService(UserManager<Usuario> userManager, IConfiguration configuration)
+	public AuthService(UserManager<Usuario> userManager, IConfiguration configuration, ITokenService tokenService)
 	{
 		_userManager = userManager;
 		_configuration = configuration;
+		_tokenService = tokenService;
 	}
 
 	public async Task<ResponseDTO> RegisterAsync(RegistroModelDTO usuarioModel)
@@ -56,18 +58,32 @@ public class AuthService : IAuthService
 		};
 	}
 
-	public async Task<object> LoginAsync(LoginModelDTO usuarioModel)
+	public async Task<ResponseDTO> LoginAsync(LoginModelDTO usuarioModel)
 	{
 		var usuario = await _userManager.FindByEmailAsync(usuarioModel.Email!);
 		if (usuario == null || !await _userManager.CheckPasswordAsync(usuario, usuarioModel.Password!))
-			return null;
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Email ou senha incorretos.",
+				StatusCode = StatusCodes.Status401Unauthorized
+			};
+		}
 
 		var authClaims = await GetAuthClaims(usuario);
-		var token = GenerateAccessToken(authClaims, _configuration);
+		var token = _tokenService.GenerateAccessToken(authClaims, _configuration);
 		var refreshToken = GenerateRefreshToken();
 
 		if (!int.TryParse(_configuration["JWT:RefreshTokenValidityInMinutes"], out int refreshTokenValidityInMinutes))
-			throw new InvalidOperationException("Período de validade do refresh token inválido.");
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Período de validade do refresh token inválido.",
+				StatusCode = StatusCodes.Status500InternalServerError
+			};
+		}
 
 		usuario.RefreshToken = refreshToken;
 		usuario.RefreshTokenExpiryTime = ConvertUtcToBrasilTime(DateTime.UtcNow).AddMinutes(refreshTokenValidityInMinutes);
@@ -75,13 +91,21 @@ public class AuthService : IAuthService
 		var atualizaUsuario = await _userManager.UpdateAsync(usuario);
 
 		if (!atualizaUsuario.Succeeded)
-			throw new InvalidOperationException("Falha ao atualizar refresh token do usuário.");
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Falha ao atualizar refresh token do usuário.",
+				StatusCode = StatusCodes.Status500InternalServerError
+			};
+		}
 
-		return new
+		return new ResponseLoginTokenDTO
 		{
 			Token = new JwtSecurityTokenHandler().WriteToken(token),
 			RefreshToken = refreshToken,
-			Expiration = token.ValidTo
+			Expiration = token.ValidTo,
+			StatusCode = StatusCodes.Status200OK
 		};
 	}
 
