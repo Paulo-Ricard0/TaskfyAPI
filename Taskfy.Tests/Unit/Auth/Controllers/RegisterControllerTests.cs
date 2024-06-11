@@ -74,10 +74,37 @@ namespace Taskfy.Tests.Unit.Auth.Controllers
 			resultado.StatusCode.Should().Be(StatusCodes.Status409Conflict);
 			resultado.Value.Should().BeEquivalentTo(responseDto);
 		}
+
+		[Fact]
+		public async Task Verifica_Retorno500_QuandoErroInternoOcorre()
+		{
+			// Arrange
+			var usuarioModel = new RegistroModelDTO
+			{
+				UserName = "testuser",
+				Email = "test@gmail.com",
+				Password = "Test123@"
+			};
+
+			var responseDto = new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Falha na criação de usuário.",
+				StatusCode = StatusCodes.Status500InternalServerError
+			};
+
+			var authService = Substitute.For<IAuthService>();
+			authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
+
+			var controller = new AuthController(authService);
+
+			// Act
+			var resultado = await controller.Register(usuarioModel) as ObjectResult;
+
 			// Assert
-			result.Should().NotBeNull();
-			result.StatusCode.Should().Be(StatusCodes.Status201Created);
-			result.Value.Should().BeEquivalentTo(responseDto);
+			resultado.Should().NotBeNull();
+			resultado.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+			resultado.Value.Should().BeEquivalentTo(responseDto);
 		}
 	}
 }
