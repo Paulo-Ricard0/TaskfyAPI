@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
@@ -123,4 +124,17 @@ public class AuthService : IAuthService
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
 		return token;
+	}
+
+	public string GenerateRefreshToken()
+	{
+		var bytesAleatorios = new byte[128];
+
+		using var geradorNumerosAleatorios = RandomNumberGenerator.Create();
+
+		geradorNumerosAleatorios.GetBytes(bytesAleatorios);
+
+		var refreshToken = Convert.ToBase64String(bytesAleatorios);
+
+		return refreshToken;
 	}
