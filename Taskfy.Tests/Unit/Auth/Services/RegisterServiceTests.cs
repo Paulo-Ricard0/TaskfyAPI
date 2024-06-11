@@ -29,8 +29,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			userManager.CreateAsync(Arg.Any<Usuario>(), Arg.Any<string>()).Returns(Task.FromResult(IdentityResult.Success));
 
 			var configuration = Substitute.For<IConfiguration>();
-			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var authService = new AuthService(userManager, configuration);
 
 			// Act
 			var resultado = await authService.RegisterAsync(usuarioModel);
@@ -60,8 +59,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(UsuarioExistente));
 
 			var configuration = Substitute.For<IConfiguration>();
-			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var authService = new AuthService(userManager, configuration);
 
 			// Act
 			var resultado = await authService.RegisterAsync(usuarioModel);
@@ -90,8 +88,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			userManager.CreateAsync(Arg.Any<Usuario>(), Arg.Any<string>()).Returns(Task.FromResult(identityResult));
 
 			var configuration = Substitute.For<IConfiguration>();
-			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var authService = new AuthService(userManager, configuration);
 
 			// Act
 			var resultado = await authService.RegisterAsync(usuarioModel);
