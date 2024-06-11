@@ -63,7 +63,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			resultado.RefreshToken.Should().NotBeNullOrEmpty();
 		}
 
-		private JwtSecurityToken CreateMockJwtToken()
+		private static JwtSecurityToken CreateMockJwtToken()
 		{
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var tokenDescriptor = new SecurityTokenDescriptor
@@ -115,6 +115,45 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			resultado.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
 			resultado.Status.Should().Be("Erro");
 			resultado.Message.Should().Be("Email ou senha incorretos.");
+		}
+
+		[Fact]
+		public async Task DeveRetornarErro500_EmFalha_AoAtualizarRefreshToken()
+		{
+			// Arrange
+			var usuarioModel = new LoginModelDTO
+			{
+				Email = "test@gmail.com",
+				Password = "Test123@"
+			};
+
+			var usuario = new Usuario
+			{
+				Email = "test@gmail.com",
+				UserName = "testuser",
+			};
+
+			var userManager = Substitute.For<UserManager<Usuario>>(
+				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
+
+			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(usuario));
+			userManager.CheckPasswordAsync(usuario, usuarioModel.Password).Returns(Task.FromResult(true));
+			userManager.UpdateAsync(usuario).Returns(Task.FromResult(IdentityResult.Failed()));
+
+			var configuration = Substitute.For<IConfiguration>();
+			configuration["JWT:RefreshTokenValidityInMinutes"].Returns("60");
+
+			var mockTokenService = Substitute.For<ITokenService>();
+			var authService = new AuthService(userManager, configuration, mockTokenService);
+
+			// Act
+			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
+
+			// Assert
+			resultado.Should().NotBeNull();
+			resultado.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+			resultado.Status.Should().Be("Erro");
+			resultado.Message.Should().Be("Falha ao atualizar refresh token do usuário.");
 		}
 	}
 }
