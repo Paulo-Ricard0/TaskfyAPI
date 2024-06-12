@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using Taskfy.API.DTOs.Usuario;
+using Taskfy.API.Logs;
 using Taskfy.API.Models;
 using Taskfy.API.Services.Auth;
 
@@ -17,7 +18,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			// Arrange
 			var usuarioModel = new RegistroModelDTO
 			{
-				UserName = "testuser",
+				Name = "testuser test",
 				Email = "test@gmail.com",
 				Password = "Test123@"
 			};
@@ -26,11 +27,13 @@ namespace Taskfy.Tests.Unit.Auth.Services
 				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
 
 			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(null));
-			userManager.CreateAsync(Arg.Any<Usuario>(), Arg.Any<string>()).Returns(Task.FromResult(IdentityResult.Success));
+			userManager.CreateAsync(Arg.Any<Usuario>(), usuarioModel.Password).Returns(Task.FromResult(IdentityResult.Success));
 
 			var configuration = Substitute.For<IConfiguration>();
 			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var mockLogger = Substitute.For<ILog>();
+
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
 
 			// Act
 			var resultado = await authService.RegisterAsync(usuarioModel);
@@ -49,7 +52,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var usuarioModel = new RegistroModelDTO
 			{
-				UserName = "testuser",
+				Name = "testuser test",
 				Email = "test@gmail.com",
 				Password = "Test123@"
 			};
@@ -61,7 +64,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var configuration = Substitute.For<IConfiguration>();
 			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var mockLogger = Substitute.For<ILog>();
+
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
 
 			// Act
 			var resultado = await authService.RegisterAsync(usuarioModel);
@@ -73,12 +78,12 @@ namespace Taskfy.Tests.Unit.Auth.Services
 		}
 
 		[Fact]
-		public async Task QuandoErroInternoOcorre_Retorna_500InternalServerError()
+		public async Task QuandoFalhaNoRegistro_Retorna_500InternalServerError()
 		{
 			// Arrange
 			var usuarioModel = new RegistroModelDTO
 			{
-				UserName = "testuser",
+				Name = "testuser test",
 				Email = "test@gmail.com",
 				Password = "Test123@"
 			};
@@ -87,11 +92,13 @@ namespace Taskfy.Tests.Unit.Auth.Services
 				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
 
 			var identityResult = IdentityResult.Failed(new IdentityError { Description = "Erro na criação do usuário." });
-			userManager.CreateAsync(Arg.Any<Usuario>(), Arg.Any<string>()).Returns(Task.FromResult(identityResult));
+			userManager.CreateAsync(Arg.Any<Usuario>(), usuarioModel.Password).Returns(Task.FromResult(identityResult));
 
 			var configuration = Substitute.For<IConfiguration>();
 			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var mockLogger = Substitute.For<ILog>();
+
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
 
 			// Act
 			var resultado = await authService.RegisterAsync(usuarioModel);
