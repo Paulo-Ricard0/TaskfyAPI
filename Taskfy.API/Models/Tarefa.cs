@@ -24,7 +24,7 @@ public class Tarefa
 	public bool Status { get; set; } = false;
 
 	[Required]
-	public string Usuario_id { get; set; }
+	public string? Usuario_id { get; set; }
 
 	[ForeignKey("Usuario_id")]
 	[JsonIgnore]
