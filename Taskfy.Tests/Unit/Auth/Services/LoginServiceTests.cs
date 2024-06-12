@@ -31,7 +31,6 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			{
 				Name = "testuser test",
 				Email = "test@gmail.com",
-				UserName = "testuser",
 			};
 
 			var userManager = Substitute.For<UserManager<Usuario>>(
@@ -99,7 +98,6 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			{
 				Name = "testuser",
 				Email = "test@gmail.com",
-				UserName = "testuser",
 			};
 
 			var userManager = Substitute.For<UserManager<Usuario>>(
@@ -138,7 +136,6 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			{
 				Name = "testuser",
 				Email = "test@gmail.com",
-				UserName = "testuser",
 			};
 
 			var userManager = Substitute.For<UserManager<Usuario>>(
@@ -180,7 +177,6 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			{
 				Name = "testuser",
 				Email = "test@gmail.com",
-				UserName = "testuser",
 			};
 
 			var userManager = Substitute.For<UserManager<Usuario>>(
