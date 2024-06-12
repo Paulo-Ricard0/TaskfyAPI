@@ -64,6 +64,11 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			resultado?.StatusCode.Should().Be(StatusCodes.Status200OK);
 			resultado?.Token.Should().NotBeNullOrEmpty();
 			resultado?.RefreshToken.Should().NotBeNullOrEmpty();
+
+			const int maxTokenValidityInMinutes = 35;
+			var maxExpiration = DateTime.UtcNow.AddMinutes(maxTokenValidityInMinutes);
+			resultado?.Expiration.Should().BeAfter(DateTime.UtcNow).And.BeBefore(maxExpiration);
+			;
 		}
 
 		private static JwtSecurityToken CreateMockJwtToken()
