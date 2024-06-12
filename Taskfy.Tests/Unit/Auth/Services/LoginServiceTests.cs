@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
+using Taskfy.API.Logs;
 using Taskfy.API.Models;
 using Taskfy.API.Services.Auth;
 
@@ -28,6 +29,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var usuario = new Usuario
 			{
+				Name = "testuser test",
 				Email = "test@gmail.com",
 				UserName = "testuser",
 			};
@@ -51,16 +53,18 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			mockTokenService.GenerateAccessToken(Arg.Any<IEnumerable<Claim>>(), Arg.Any<IConfiguration>())
 				.Returns(CreateMockJwtToken());
 
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var mockLogger = Substitute.For<ILog>();
+
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseLoginTokenDTO;
 
 			// Assert
 			resultado.Should().NotBeNull();
-			resultado.StatusCode.Should().Be(StatusCodes.Status200OK);
-			resultado.Token.Should().NotBeNullOrEmpty();
-			resultado.RefreshToken.Should().NotBeNullOrEmpty();
+			resultado?.StatusCode.Should().Be(StatusCodes.Status200OK);
+			resultado?.Token.Should().NotBeNullOrEmpty();
+			resultado?.RefreshToken.Should().NotBeNullOrEmpty();
 		}
 
 		private static JwtSecurityToken CreateMockJwtToken()
@@ -93,6 +97,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var usuario = new Usuario
 			{
+				Name = "testuser",
 				Email = "test@gmail.com",
 				UserName = "testuser",
 			};
@@ -105,7 +110,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var configuration = Substitute.For<IConfiguration>();
 			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var mockLogger = Substitute.For<ILog>();
+
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
@@ -129,6 +136,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var usuario = new Usuario
 			{
+				Name = "testuser",
 				Email = "test@gmail.com",
 				UserName = "testuser",
 			};
@@ -144,7 +152,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			configuration["JWT:RefreshTokenValidityInMinutes"].Returns("60");
 
 			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var mockLogger = Substitute.For<ILog>();
+
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
@@ -168,7 +178,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var usuario = new Usuario
 			{
-				Id = "1",
+				Name = "testuser",
 				Email = "test@gmail.com",
 				UserName = "testuser",
 			};
@@ -183,7 +193,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			configuration["JWT:RefreshTokenValidityInMinutes"].Returns("invalid_value");
 
 			var mockTokenService = Substitute.For<ITokenService>();
-			var authService = new AuthService(userManager, configuration, mockTokenService);
+			var mockLogger = Substitute.For<ILog>();
+
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
