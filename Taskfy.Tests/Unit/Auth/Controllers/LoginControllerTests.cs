@@ -39,7 +39,39 @@ public class LoginControllerTests
 
 		// Assert
 		resultado.Should().NotBeNull();
-		resultado.StatusCode.Should().Be(StatusCodes.Status200OK);
-		resultado.Value.Should().BeEquivalentTo(responseToken);
+		resultado?.StatusCode.Should().Be(StatusCodes.Status200OK);
+		resultado?.Value.Should().BeEquivalentTo(responseToken);
+	}
+
+	[Fact]
+	public async Task Verifica_401Unauthorized_QuandoCredenciaisInvalidas()
+	{
+		// Arrange
+		var usuarioModel = new LoginModelDTO
+		{
+			Email = "test@gmail.com",
+			Password = "Test123@"
+		};
+
+		var response = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Email ou senha incorretos.",
+			StatusCode = StatusCodes.Status401Unauthorized
+		};
+
+		var authService = Substitute.For<IAuthService>();
+		authService.LoginAsync(usuarioModel).Returns(Task.FromResult(response));
+
+		var controller = new AuthController(authService);
+
+		// Act
+		var resultado = await controller.Login(usuarioModel) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+		resultado?.Value.Should().BeEquivalentTo(response);
+	}
 	}
 }
