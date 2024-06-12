@@ -73,5 +73,35 @@ public class LoginControllerTests
 		resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
 		resultado?.Value.Should().BeEquivalentTo(response);
 	}
+
+	[Fact]
+	public async Task Verifica_500ErroInterno_QuandoFalhaAoAtualizarRefreshToken()
+	{
+		// Arrange
+		var usuarioModel = new LoginModelDTO
+		{
+			Email = "test@gmail.com",
+			Password = "Test123@"
+		};
+
+		var response = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Falha ao atualizar refresh token do usuário.",
+			StatusCode = StatusCodes.Status500InternalServerError
+		};
+
+		var authService = Substitute.For<IAuthService>();
+		authService.LoginAsync(usuarioModel).Returns(Task.FromResult(response));
+
+		var controller = new AuthController(authService);
+
+		// Act
+		var resultado = await controller.Login(usuarioModel) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		resultado?.Value.Should().BeEquivalentTo(response);
 	}
 }
