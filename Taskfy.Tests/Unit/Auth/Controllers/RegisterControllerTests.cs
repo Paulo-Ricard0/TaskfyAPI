@@ -17,7 +17,7 @@ public class RegisterControllerTests
 		// Arrange
 		var usuarioModel = new RegistroModelDTO
 		{
-			UserName = "testuser",
+			Name = "testuser test",
 			Email = "test@gmail.com",
 			Password = "Test123@"
 		};
@@ -39,8 +39,8 @@ public class RegisterControllerTests
 
 		// Assert
 		resultado.Should().NotBeNull();
-		resultado.StatusCode.Should().Be(StatusCodes.Status201Created);
-		resultado.Value.Should().BeEquivalentTo(responseDto);
+		resultado?.StatusCode.Should().Be(StatusCodes.Status201Created);
+		resultado?.Value.Should().BeEquivalentTo(responseDto);
 	}
 
 	[Fact]
@@ -49,7 +49,7 @@ public class RegisterControllerTests
 		// Arrange
 		var usuarioModel = new RegistroModelDTO
 		{
-			UserName = "testuser",
+			Name = "testuser",
 			Email = "test@gmail.com",
 			Password = "Test123@"
 		};
@@ -71,8 +71,8 @@ public class RegisterControllerTests
 
 		// Assert
 		resultado.Should().NotBeNull();
-		resultado.StatusCode.Should().Be(StatusCodes.Status409Conflict);
-		resultado.Value.Should().BeEquivalentTo(responseDto);
+		resultado?.StatusCode.Should().Be(StatusCodes.Status409Conflict);
+		resultado?.Value.Should().BeEquivalentTo(responseDto);
 	}
 
 	[Fact]
@@ -81,7 +81,7 @@ public class RegisterControllerTests
 		// Arrange
 		var usuarioModel = new RegistroModelDTO
 		{
-			UserName = "testuser",
+			Name = "testuser",
 			Email = "test@gmail.com",
 			Password = "Test123@"
 		};
@@ -103,7 +103,7 @@ public class RegisterControllerTests
 
 		// Assert
 		resultado.Should().NotBeNull();
-		resultado.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		resultado.Value.Should().BeEquivalentTo(responseDto);
+		resultado?.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		resultado?.Value.Should().BeEquivalentTo(responseDto);
 	}
 }
