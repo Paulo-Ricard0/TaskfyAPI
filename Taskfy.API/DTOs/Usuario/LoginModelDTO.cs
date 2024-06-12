@@ -4,9 +4,11 @@ namespace Taskfy.API.DTOs.Usuario;
 
 public class LoginModelDTO
 {
+	[EmailAddress(ErrorMessage = "Email inválido.")]
 	[Required(ErrorMessage = "Email é obrigatório.")]
-	public string? Email { get; set; }
+	public string Email { get; set; } = string.Empty;
 
 	[Required(ErrorMessage = "Senha é obrigatória.")]
-	public string? Password { get; set; }
+	[StringLength(100)]
+	public string Password { get; set; } = string.Empty;
 }
