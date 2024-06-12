@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
+using Taskfy.API.Logs;
 using Taskfy.API.Models;
 
 namespace Taskfy.API.Services.Auth;
@@ -13,12 +14,14 @@ public class AuthService : IAuthService
 	private readonly UserManager<Usuario> _userManager;
 	private readonly IConfiguration _configuration;
 	private readonly ITokenService _tokenService;
+	private readonly ILog _logger;
 
-	public AuthService(UserManager<Usuario> userManager, IConfiguration configuration, ITokenService tokenService)
+	public AuthService(UserManager<Usuario> userManager, IConfiguration configuration, ITokenService tokenService, ILog logger)
 	{
 		_userManager = userManager;
 		_configuration = configuration;
 		_tokenService = tokenService;
+		_logger = logger;
 	}
 
 	public async Task<ResponseDTO> RegisterAsync(RegistroModelDTO usuarioModel)
@@ -31,12 +34,13 @@ public class AuthService : IAuthService
 
 		Usuario usuario = new()
 		{
+			Name = usuarioModel.Name,
 			Email = usuarioModel.Email,
-			UserName = usuarioModel.UserName,
+			UserName = usuarioModel.Email,
 			SecurityStamp = Guid.NewGuid().ToString()
 		};
 
-		var registraUsuario = await _userManager.CreateAsync(usuario, usuarioModel.Password!);
+		var registraUsuario = await _userManager.CreateAsync(usuario, usuarioModel.Password);
 
 		if (registraUsuario.Succeeded)
 		{
@@ -58,8 +62,8 @@ public class AuthService : IAuthService
 
 	public async Task<ResponseDTO> LoginAsync(LoginModelDTO usuarioModel)
 	{
-		var usuario = await _userManager.FindByEmailAsync(usuarioModel.Email!);
-		if (usuario == null || !await _userManager.CheckPasswordAsync(usuario, usuarioModel.Password!))
+		var usuario = await _userManager.FindByEmailAsync(usuarioModel.Email);
+		if (usuario == null || !await _userManager.CheckPasswordAsync(usuario, usuarioModel.Password))
 		{
 			return new ResponseDTO
 			{
@@ -98,6 +102,7 @@ public class AuthService : IAuthService
 			};
 		}
 
+		_logger.LogToFile("Login - Sucesso", "Login efetuado com sucesso!");
 		return new ResponseLoginTokenDTO
 		{
 			Token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -114,7 +119,7 @@ public class AuthService : IAuthService
 
 		var authClaims = new List<Claim>
 	{
-		new Claim(ClaimTypes.Name, usuario.UserName!),
+		new Claim(ClaimTypes.Name, usuario.Name),
 		new Claim(ClaimTypes.Email, usuario.Email!),
 		new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 	};
@@ -135,6 +140,4 @@ public class AuthService : IAuthService
 
 		return refreshToken;
 	}
-
-
 }
