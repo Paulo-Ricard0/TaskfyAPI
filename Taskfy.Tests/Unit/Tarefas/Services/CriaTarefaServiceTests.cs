@@ -96,5 +96,33 @@ public class CriaTarefaServiceTests : BaseServiceSetup
 		resultado?.Message.Should().Be("Dados de tarefa inválidos.");
 	}
 
+	[Fact]
+	public async Task DeveRetornar_401Unauthorized_QuandoUserIdInvalido()
+	{
+		// Arrange
+		var tarefaRequestDto = new TarefaRequestDTO
+		{
+			Titulo = "Nova Tarefa",
+			Descricao = "Descrição da nova tarefa",
+			Data_vencimento = DateTime.Now.AddDays(1)
+		};
 
+		const string? userId = "";
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.CriaTarefaAsync(tarefaRequestDto, claimsPrincipal);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Usuário não autorizado.");
+	}
 }
