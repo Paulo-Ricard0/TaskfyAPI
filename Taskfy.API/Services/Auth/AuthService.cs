@@ -121,6 +121,7 @@ public class AuthService : IAuthService
 	{
 		new Claim(ClaimTypes.Name, usuario.Name),
 		new Claim(ClaimTypes.Email, usuario.Email!),
+		new Claim("UserId", usuario.Id),
 		new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 	};
 
