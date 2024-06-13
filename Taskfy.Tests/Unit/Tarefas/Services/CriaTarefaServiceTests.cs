@@ -71,5 +71,30 @@ public class CriaTarefaServiceTests : BaseServiceSetup
 		LoggerMock.Received(1).LogToFile("Tarefa", "Tarefa criada com sucesso!");
 	}
 
+	[Fact]
+	public async Task DeveRetornar_400BadRequest_QuandoDadosTarefaInvalidos()
+	{
+		// Arrange
+		TarefaRequestDTO? tarefaRequestDto = null;
+
+		var userId = Guid.NewGuid().ToString();
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.CriaTarefaAsync(tarefaRequestDto!, claimsPrincipal);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Dados de tarefa inválidos.");
+	}
+
 
 }
