@@ -98,4 +98,30 @@ public class BuscaTodasTarefasServiceTests : BaseServiceSetup
 		resultado?.Message.Should().Be("Usuário não autorizado.");
 		resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
 	}
+
+	[Fact]
+	public async Task DeveRetornar_404NotFound_QuandoTarefasNaoEncontradas()
+	{
+		var userId = Guid.NewGuid().ToString();
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		TarefaRepositoryMock.GetAllAsync(Arg.Any<Expression<Func<Tarefa, bool>>>())
+			.Returns(Task.FromResult<IEnumerable<Tarefa>>(null!));
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.BuscaTodasTarefasAsync(claimsPrincipal);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado.Should().BeOfType<ResponseDTO>();
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Tarefas não encontradas.");
+		resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+	}
 }
