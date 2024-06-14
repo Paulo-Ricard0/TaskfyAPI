@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Tarefas;
@@ -50,15 +51,48 @@ public class TarefaService : ITarefaService
 		tarefa.Usuario_id = userId;
 
 		var novaTarefa = _repository.TarefaRepository.Create(tarefa);
-
 		await _repository.CommitAsync();
 
 		var responseTarefaDTO = _mapper.Map<TarefaDTO>(novaTarefa);
 
-		return new TarefaResponseDTO
+		_logger.LogToFile("Tarefa", "Tarefa criada com sucesso!");
+		return new TarefaResponseDTO<TarefaDTO>
 		{
 			Data = responseTarefaDTO,
 			StatusCode = StatusCodes.Status201Created,
+		};
+	}
+
+	public async Task<ResponseDTO> BuscaTodasTarefasAsync(ClaimsPrincipal user)
+	{
+		var userId = user.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+		if (string.IsNullOrEmpty(userId))
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Usuário não autorizado.",
+				StatusCode = StatusCodes.Status401Unauthorized,
+			};
+		}
+
+		var tarefas = await _repository.TarefaRepository.GetAllAsync(t => t.Usuario_id == userId);
+		if (tarefas.IsNullOrEmpty())
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Tarefas não encontradas.",
+				StatusCode = StatusCodes.Status404NotFound,
+			};
+		}
+
+		var responseTarefasDTO = _mapper.Map<IEnumerable<TarefaDTO>>(tarefas);
+
+		return new TarefaResponseDTO<IEnumerable<TarefaDTO>>
+		{
+			Data = responseTarefasDTO,
+			StatusCode = StatusCodes.Status200OK,
 		};
 	}
 }
