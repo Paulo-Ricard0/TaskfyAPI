@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Tarefas;
 using Taskfy.API.DTOs.Tarefas.Response;
 using Taskfy.API.Models;
@@ -73,5 +74,28 @@ public class BuscaTodasTarefasServiceTests : BaseServiceSetup
 		resultado.Should().BeOfType<TarefaResponseDTO<IEnumerable<TarefaDTO>>>();
 		resultado?.StatusCode.Should().Be(StatusCodes.Status200OK);
 		resultado?.Data.Should().BeEquivalentTo(tarefasDTO);
+	}
+
+	[Fact]
+	public async Task DeveRetornar_401Unauthorized_QuandoUsuarioIdInvalido()
+	{
+		string? userId = "";
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.BuscaTodasTarefasAsync(claimsPrincipal);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado.Should().BeOfType<ResponseDTO>();
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Usuário não autorizado.");
+		resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
 	}
 }
