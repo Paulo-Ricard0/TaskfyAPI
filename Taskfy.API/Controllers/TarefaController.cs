@@ -47,4 +47,18 @@ public class TarefaController : ControllerBase
 
 		return StatusCode(response.StatusCode, response);
 	}
+
+	[Authorize]
+	[HttpGet("{tarefaId}")]
+	[ProducesResponseType(typeof(TarefaResponseDTO<TarefaDTO>), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesDefaultResponseType]
+	public async Task<IActionResult> BuscaTarefaPorId(Guid tarefaId)
+	{
+		var response = await _tarefaService.BuscaTarefaPorIdAsync(User, tarefaId);
+
+		return StatusCode(response.StatusCode, response);
+	}
 }
