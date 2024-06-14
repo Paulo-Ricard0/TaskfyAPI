@@ -55,4 +55,30 @@ public class CriaTarefaControllerTests : BaseControllerSetup
 		resultado?.StatusCode.Should().Be(StatusCodes.Status201Created);
 		resultado?.Value.Should().BeEquivalentTo(responseTarefaCriada);
 	}
+
+	[Fact]
+	public async Task DeveRetornar_400BadRequest_QuandoDadosTarefaInvalidos()
+	{
+		TarefaRequestDTO? tarefaRequestDto = null;
+
+		var responseTarefaInvalida = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Dados de tarefa inválidos.",
+			StatusCode = StatusCodes.Status400BadRequest,
+		};
+
+		TarefaServiceMock.CriaTarefaAsync(tarefaRequestDto!, Arg.Any<ClaimsPrincipal>())
+			.Returns(Task.FromResult(responseTarefaInvalida));
+
+		var controller = new TarefaController(TarefaServiceMock);
+
+		// Act
+		var resultado = await controller.CriaTarefa(tarefaRequestDto!) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+		resultado?.Value.Should().BeEquivalentTo(responseTarefaInvalida);
+	}
 }
