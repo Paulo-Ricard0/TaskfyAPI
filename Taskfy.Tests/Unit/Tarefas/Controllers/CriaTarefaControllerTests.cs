@@ -81,4 +81,35 @@ public class CriaTarefaControllerTests : BaseControllerSetup
 		resultado?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 		resultado?.Value.Should().BeEquivalentTo(responseTarefaInvalida);
 	}
+
+	[Fact]
+	public async Task DeveRetornar_401Unauthorized_QuandoUserIdInvalido()
+	{
+		var tarefaRequestDto = new TarefaRequestDTO
+		{
+			Titulo = "Nova Tarefa",
+			Descricao = "Descrição da nova tarefa",
+			Data_vencimento = DateTime.Now.AddDays(1)
+		};
+
+		var responseTarefaUnauthorized = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Usuário não autorizado.",
+			StatusCode = StatusCodes.Status401Unauthorized,
+		};
+
+		TarefaServiceMock.CriaTarefaAsync(tarefaRequestDto, Arg.Any<ClaimsPrincipal>())
+			.Returns(Task.FromResult(responseTarefaUnauthorized));
+
+		var controller = new TarefaController(TarefaServiceMock);
+
+		// Act
+		var resultado = await controller.CriaTarefa(tarefaRequestDto) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+		resultado?.Value.Should().BeEquivalentTo(responseTarefaUnauthorized);
+	}
 }
