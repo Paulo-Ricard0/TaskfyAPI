@@ -60,7 +60,7 @@ public class CriaTarefaServiceTests : BaseServiceSetup
 		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
 
 		// Act
-		var resultado = await tarefaService.CriaTarefaAsync(tarefaRequestDto, claimsPrincipal) as TarefaResponseDTO;
+		var resultado = await tarefaService.CriaTarefaAsync(tarefaRequestDto, claimsPrincipal) as TarefaResponseDTO<TarefaDTO>;
 
 		// Assert
 		resultado.Should().NotBeNull();
