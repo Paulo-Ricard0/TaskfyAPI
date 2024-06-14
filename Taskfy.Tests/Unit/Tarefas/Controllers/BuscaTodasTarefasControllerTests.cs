@@ -59,5 +59,29 @@ namespace Taskfy.Tests.Unit.Tarefas.Controllers
 			resultado?.StatusCode.Should().Be(StatusCodes.Status200OK);
 			resultado?.Value.Should().BeEquivalentTo(responseTarefasEncontradas);
 		}
+
+		[Fact]
+		public async Task DeveRetornar_401Unauthorized_QuandoUserIdInvalido()
+		{
+			var responseTarefaUnauthorized = new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Usuário não autorizado.",
+				StatusCode = StatusCodes.Status401Unauthorized,
+			};
+
+			TarefaServiceMock.BuscaTodasTarefasAsync(Arg.Any<ClaimsPrincipal>())
+			.Returns(Task.FromResult(responseTarefaUnauthorized as ResponseDTO));
+
+			var controller = new TarefaController(TarefaServiceMock);
+
+			// Act
+			var resultado = await controller.BuscaTodasTarefas() as ObjectResult;
+
+			// Assert
+			resultado.Should().NotBeNull();
+			resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+			resultado?.Value.Should().BeEquivalentTo(responseTarefaUnauthorized);
+		}
 	}
 }
