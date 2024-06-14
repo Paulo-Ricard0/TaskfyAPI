@@ -95,4 +95,37 @@ public class TarefaService : ITarefaService
 			StatusCode = StatusCodes.Status200OK,
 		};
 	}
+
+	public async Task<ResponseDTO> BuscaTarefaPorIdAsync(ClaimsPrincipal user, Guid tarefaId)
+	{
+		var userId = user.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+		if (string.IsNullOrEmpty(userId))
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Usuário não autorizado.",
+				StatusCode = StatusCodes.Status401Unauthorized,
+			};
+		}
+
+		var tarefa = await _repository.TarefaRepository.GetAsync(t => t.Id == tarefaId && t.Usuario_id == userId);
+		if (tarefa == null)
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Tarefa não encontrada.",
+				StatusCode = StatusCodes.Status404NotFound,
+			};
+		}
+
+		var responseTarefaDTO = _mapper.Map<TarefaDTO>(tarefa);
+
+		return new TarefaResponseDTO<TarefaDTO>
+		{
+			Data = responseTarefaDTO,
+			StatusCode = StatusCodes.Status200OK,
+		};
+	}
 }
