@@ -84,4 +84,40 @@ public class AtualizaTarefaServiceTests : BaseServiceSetup
 		await UnitOfWorkMock.Received(1).CommitAsync();
 		UnitOfWorkMock.TarefaRepository.Received(1).Update(tarefaExistente);
 	}
+
+	[Fact]
+	public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
+	{
+		// Arrange
+		var userId = Guid.NewGuid().ToString();
+		var tarefaId = Guid.NewGuid();
+
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		var tarefaRequestUpdate = new TarefaRequestUpdateDTO
+		{
+			Titulo = "Tarefa Atualizada",
+			Descricao = "Descrição atualizada",
+			Data_vencimento = DateTime.Now.AddDays(3),
+			Status = true
+		};
+
+		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(Task.FromResult<Tarefa?>(null));
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Tarefa não encontrada.");
+		resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+	}
 }
