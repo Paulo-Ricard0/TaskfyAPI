@@ -120,4 +120,50 @@ public class AtualizaTarefaServiceTests : BaseServiceSetup
 		resultado?.Message.Should().Be("Tarefa não encontrada.");
 		resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
 	}
+
+	[Fact]
+	public async Task DeveRetornar_400BadRequest_QuandoIdsInvalidos()
+	{
+		// Arrange
+		var userId = Guid.NewGuid().ToString();
+		var tarefaId = Guid.NewGuid();
+
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		var tarefaRequestUpdate = new TarefaRequestUpdateDTO
+		{
+			Titulo = "Tarefa Atualizada",
+			Descricao = "Descrição atualizada",
+			Data_vencimento = DateTime.Now.AddDays(3),
+			Status = true
+		};
+
+		var tarefaExistente = new Tarefa
+		{
+			Id = Guid.NewGuid(),
+			Titulo = "Tarefa Existente",
+			Descricao = "Descrição da tarefa existente",
+			Data_vencimento = DateTime.Now.AddDays(2),
+			Status = false,
+			Usuario_id = Guid.NewGuid().ToString()
+		};
+
+		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(tarefaExistente);
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Dados de Ids inválidos.");
+		resultado?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+	}
 }
