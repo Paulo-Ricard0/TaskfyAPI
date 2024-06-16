@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Tarefas;
 using Taskfy.API.DTOs.Tarefas.Response;
 using Taskfy.API.Models;
@@ -91,5 +92,33 @@ namespace Taskfy.Tests.Unit.Tarefas.Services
 			resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
 		}
 
+		[Fact]
+		public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
+		{
+			// Arrange
+			var userId = Guid.NewGuid().ToString();
+			var claims = new[]
+			{
+				new Claim("UserId", userId)
+			};
+			var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+			var tarefaId = Guid.NewGuid();
+
+			TarefaRepositoryMock.GetAsync(Arg.Any<Expression<Func<Tarefa, bool>>>())
+				.Returns(Task.FromResult<Tarefa?>(null));
+
+			var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+			// Act
+			var resultado = await tarefaService.BuscaTarefaPorIdAsync(claimsPrincipal, tarefaId);
+
+			// Assert
+			resultado.Should().NotBeNull();
+			resultado.Should().BeOfType<ResponseDTO>();
+			resultado?.Status.Should().Be("Erro");
+			resultado?.Message.Should().Be("Tarefa não encontrada.");
+			resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+		}
 	}
 }
