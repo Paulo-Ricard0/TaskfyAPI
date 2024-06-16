@@ -65,6 +65,31 @@ namespace Taskfy.Tests.Unit.Tarefas.Services
 			resultado?.Data.Should().BeEquivalentTo(tarefaDTO);
 		}
 
+		[Fact]
+		public async Task DeveRetornar_401Unauthorized_QuandoUsuarioIdInvalido()
+		{
+			// Arrange
+			string? userId = "";
+			var claims = new[]
+			{
+				new Claim("UserId", userId)
+			};
+			var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+			var tarefaId = Guid.NewGuid();
+
+			var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+			// Act
+			var resultado = await tarefaService.BuscaTarefaPorIdAsync(claimsPrincipal, tarefaId);
+
+			// Assert
+			resultado.Should().NotBeNull();
+			resultado.Should().BeOfType<ResponseDTO>();
+			resultado?.Status.Should().Be("Erro");
+			resultado?.Message.Should().Be("Usuário não autorizado.");
+			resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+		}
 
 	}
 }
