@@ -9,4 +9,5 @@ public interface ITarefaService
 	Task<ResponseDTO> CriaTarefaAsync(TarefaRequestDTO tarefaModel, ClaimsPrincipal user);
 	Task<ResponseDTO> BuscaTodasTarefasAsync(ClaimsPrincipal user);
 	Task<ResponseDTO> BuscaTarefaPorIdAsync(ClaimsPrincipal user, Guid tarefaId);
+	Task<ResponseDTO> AtualizaTarefa(ClaimsPrincipal user, Guid tarefaId, TarefaRequestUpdateDTO tarefaModel);
 }

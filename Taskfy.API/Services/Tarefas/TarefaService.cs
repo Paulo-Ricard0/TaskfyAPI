@@ -128,4 +128,46 @@ public class TarefaService : ITarefaService
 			StatusCode = StatusCodes.Status200OK,
 		};
 	}
+
+	public async Task<ResponseDTO> AtualizaTarefa(ClaimsPrincipal user, Guid tarefaId, TarefaRequestUpdateDTO tarefaModel)
+	{
+		var userId = user.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
+		var tarefaExistente = await _repository.TarefaRepository.FindAsync(tarefaId);
+		if (tarefaExistente == null)
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Tarefa não encontrada.",
+				StatusCode = StatusCodes.Status404NotFound,
+			};
+		}
+
+		if (tarefaId != tarefaExistente.Id || userId != tarefaExistente.Usuario_id)
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Dados de Ids inválidos.",
+				StatusCode = StatusCodes.Status400BadRequest,
+			};
+		}
+
+		tarefaExistente.Titulo = tarefaModel.Titulo;
+		tarefaExistente.Descricao = tarefaModel.Descricao;
+		tarefaExistente.Data_vencimento = tarefaModel.Data_vencimento;
+		tarefaExistente.Status = tarefaModel.Status;
+
+		var tarefaAtualizada = _repository.TarefaRepository.Update(tarefaExistente);
+		await _repository.CommitAsync();
+
+		var responseTarefaAtualizadaDTO = _mapper.Map<TarefaDTO>(tarefaAtualizada);
+
+		return new TarefaResponseDTO<TarefaDTO>
+		{
+			Data = responseTarefaAtualizadaDTO,
+			StatusCode = StatusCodes.Status200OK,
+		};
+	}
 }
