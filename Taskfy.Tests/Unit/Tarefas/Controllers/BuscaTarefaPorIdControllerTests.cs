@@ -50,5 +50,31 @@ public class BuscaTarefaPorIdControllerTests : BaseControllerSetup
 		resultado?.Value.Should().BeEquivalentTo(responseTarefaEncontrada);
 	}
 
+	[Fact]
+	public async Task DeveRetornar_401Unauthorized_QuandoUserIdInvalido()
+	{
+		// Arrange
+		var responseTarefaUnauthorized = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Usuário não autorizado.",
+			StatusCode = StatusCodes.Status401Unauthorized,
+		};
+
+		var tarefaId = Guid.NewGuid();
+
+		TarefaServiceMock.BuscaTarefaPorIdAsync(Arg.Any<ClaimsPrincipal>(), tarefaId)
+		.Returns(Task.FromResult(responseTarefaUnauthorized));
+
+		var controller = new TarefaController(TarefaServiceMock);
+
+		// Act
+		var resultado = await controller.BuscaTarefaPorId(tarefaId) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+		resultado?.Value.Should().BeEquivalentTo(responseTarefaUnauthorized);
+	}
 
 }
