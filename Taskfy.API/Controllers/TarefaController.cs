@@ -61,4 +61,18 @@ public class TarefaController : ControllerBase
 
 		return StatusCode(response.StatusCode, response);
 	}
+
+	[Authorize]
+	[HttpPut("{tarefaId}")]
+	[ProducesResponseType(typeof(TarefaResponseDTO<TarefaDTO>), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesDefaultResponseType]
+	public async Task<IActionResult> AtualizaTarefa(Guid tarefaId, [FromBody] TarefaRequestUpdateDTO tarefaModel)
+	{
+		var response = await _tarefaService.AtualizaTarefa(User, tarefaId, tarefaModel);
+
+		return StatusCode(response.StatusCode, response);
+	}
 }
