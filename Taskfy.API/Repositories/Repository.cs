@@ -30,6 +30,11 @@ public class Repository<T> : IRepository<T> where T : class
 		return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate);
 	}
 
+	public async Task<T?> FindAsync(params object[] keyValues)
+	{
+		return await _context.Set<T>().FindAsync(keyValues);
+	}
+
 	public T Create(T entity)
 	{
 		_context.Set<T>().Add(entity);
