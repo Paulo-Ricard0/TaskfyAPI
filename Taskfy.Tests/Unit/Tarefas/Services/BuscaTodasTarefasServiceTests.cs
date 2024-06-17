@@ -17,6 +17,7 @@ public class BuscaTodasTarefasServiceTests : BaseServiceSetup
 	[Fact]
 	public async Task DeveRetornar_200OK_QuandoUsuarioPossuirTarefas()
 	{
+		// Arrange
 		var userId = Guid.NewGuid().ToString();
 		var claims = new[]
 		{
@@ -79,6 +80,7 @@ public class BuscaTodasTarefasServiceTests : BaseServiceSetup
 	[Fact]
 	public async Task DeveRetornar_401Unauthorized_QuandoUsuarioIdInvalido()
 	{
+		// Arrange
 		string? userId = "";
 		var claims = new[]
 		{
@@ -102,6 +104,7 @@ public class BuscaTodasTarefasServiceTests : BaseServiceSetup
 	[Fact]
 	public async Task DeveRetornar_404NotFound_QuandoTarefasNaoEncontradas()
 	{
+		// Arrange
 		var userId = Guid.NewGuid().ToString();
 		var claims = new[]
 		{
