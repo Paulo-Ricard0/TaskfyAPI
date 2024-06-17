@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status409Conflict)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> Register([FromBody] RegistroModelDTO usuarioModel)
 	{
@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
 	[ProducesResponseType(typeof(ResponseLoginTokenDTO), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status401Unauthorized)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> Login([FromBody] LoginModelDTO usuarioModel)
 	{

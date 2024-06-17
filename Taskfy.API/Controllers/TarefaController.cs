@@ -25,7 +25,7 @@ public class TarefaController : ControllerBase
 	[ProducesResponseType(typeof(TarefaResponseDTO<TarefaDTO>), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status401Unauthorized)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> CriaTarefa([FromBody] TarefaRequestDTO tarefaModel)
 	{
@@ -39,7 +39,7 @@ public class TarefaController : ControllerBase
 	[ProducesResponseType(typeof(TarefaResponseDTO<IEnumerable<TarefaDTO>>), StatusCodes.Status200OK)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status404NotFound)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> BuscaTodasTarefas()
 	{
@@ -53,7 +53,7 @@ public class TarefaController : ControllerBase
 	[ProducesResponseType(typeof(TarefaResponseDTO<TarefaDTO>), StatusCodes.Status200OK)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status404NotFound)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> BuscaTarefaPorId(Guid tarefaId)
 	{
@@ -67,7 +67,7 @@ public class TarefaController : ControllerBase
 	[ProducesResponseType(typeof(TarefaResponseDTO<TarefaDTO>), StatusCodes.Status200OK)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status404NotFound)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> AtualizaTarefa(Guid tarefaId, [FromBody] TarefaRequestUpdateDTO tarefaModel)
 	{
@@ -80,7 +80,7 @@ public class TarefaController : ControllerBase
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status200OK)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status404NotFound)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status403Forbidden)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	[HttpDelete("{tarefaId}")]
 	public async Task<IActionResult> DeletaTarefa(Guid tarefaId)
