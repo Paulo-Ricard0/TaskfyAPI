@@ -81,4 +81,43 @@ public class DeletaTarefaServiceTests : BaseServiceSetup
 		resultado?.Message.Should().Be("Tarefa não encontrada.");
 		resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
 	}
+
+	[Fact]
+	public async Task DeveRetornar_403Forbidden_QuandoUserIdInvalido()
+	{
+		// Arrange
+		var userId = Guid.NewGuid().ToString();
+		var tarefaId = Guid.NewGuid();
+
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		var tarefaExistente = new Tarefa
+		{
+			Id = tarefaId,
+			Titulo = "Tarefa Existente",
+			Descricao = "Descrição da tarefa existente",
+			Data_vencimento = DateTime.Now.AddDays(2),
+			Usuario = null,
+			Status = false,
+			Usuario_id = Guid.NewGuid().ToString()
+		};
+
+		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(tarefaExistente);
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.DeletaTarefa(claimsPrincipal, tarefaId);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Você não tem permissão para deletar essa tarefa.");
+		resultado?.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+	}
 }
