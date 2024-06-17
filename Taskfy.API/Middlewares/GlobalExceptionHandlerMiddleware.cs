@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Taskfy.API.DTOs;
 using Taskfy.API.Logs;
 
 namespace Taskfy.API.Middlewares;
@@ -29,11 +30,11 @@ public class GlobalExceptionHandlerMiddleware
 	private static Task HandleExceptionAsync(HttpContext context, Exception exception, ILog logger)
 	{
 		var statusCode = HttpStatusCode.InternalServerError;
-		var response = new
+		var response = new GlobalErrorResponseDTO
 		{
-			status = "Erro",
-			message = "Ocorreu um erro interno no servidor.",
-			error = exception.Message,
+			Status = "Erro",
+			Message = "Ocorreu um erro interno no servidor.",
+			Error = exception.Message,
 		};
 
 		var log = new
