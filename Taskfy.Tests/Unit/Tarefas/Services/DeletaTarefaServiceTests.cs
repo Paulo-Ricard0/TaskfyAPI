@@ -54,5 +54,31 @@ public class DeletaTarefaServiceTests : BaseServiceSetup
 		UnitOfWorkMock.TarefaRepository.Received(1).Delete(tarefaExistente);
 	}
 
+	[Fact]
+	public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
+	{
+		// Arrange
+		var userId = Guid.NewGuid().ToString();
+		var tarefaId = Guid.NewGuid();
 
+		var claims = new[]
+		{
+			new Claim("UserId", userId)
+		};
+
+		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(Task.FromResult<Tarefa?>(null));
+
+		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
+
+		// Act
+		var resultado = await tarefaService.DeletaTarefa(claimsPrincipal, tarefaId);
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.Status.Should().Be("Erro");
+		resultado?.Message.Should().Be("Tarefa não encontrada.");
+		resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+	}
 }
