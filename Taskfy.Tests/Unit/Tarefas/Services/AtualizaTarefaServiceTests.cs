@@ -122,7 +122,7 @@ public class AtualizaTarefaServiceTests : BaseServiceSetup
 	}
 
 	[Fact]
-	public async Task DeveRetornar_400BadRequest_QuandoIdsInvalidos()
+	public async Task DeveRetornar_403Forbidden_QuandoUserIdInvalido()
 	{
 		// Arrange
 		var userId = Guid.NewGuid().ToString();
@@ -145,7 +145,7 @@ public class AtualizaTarefaServiceTests : BaseServiceSetup
 
 		var tarefaExistente = new Tarefa
 		{
-			Id = Guid.NewGuid(),
+			Id = tarefaId,
 			Titulo = "Tarefa Existente",
 			Descricao = "Descrição da tarefa existente",
 			Data_vencimento = DateTime.Now.AddDays(2),
@@ -163,7 +163,7 @@ public class AtualizaTarefaServiceTests : BaseServiceSetup
 		// Assert
 		resultado.Should().NotBeNull();
 		resultado?.Status.Should().Be("Erro");
-		resultado?.Message.Should().Be("Dados de Ids inválidos.");
-		resultado?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+		resultado?.Message.Should().Be("Você não tem permissão para atualizar essa tarefa.");
+		resultado?.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
 	}
 }
