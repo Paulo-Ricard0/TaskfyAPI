@@ -144,13 +144,13 @@ public class TarefaService : ITarefaService
 			};
 		}
 
-		if (tarefaId != tarefaExistente.Id || userId != tarefaExistente.Usuario_id)
+		if (userId != tarefaExistente.Usuario_id)
 		{
 			return new ResponseDTO
 			{
 				Status = "Erro",
-				Message = "Dados de Ids inválidos.",
-				StatusCode = StatusCodes.Status400BadRequest,
+				Message = "Você não tem permissão para atualizar essa tarefa.",
+				StatusCode = StatusCodes.Status403Forbidden,
 			};
 		}
 
@@ -167,6 +167,42 @@ public class TarefaService : ITarefaService
 		return new TarefaResponseDTO<TarefaDTO>
 		{
 			Data = responseTarefaAtualizadaDTO,
+			StatusCode = StatusCodes.Status200OK,
+		};
+	}
+
+	public async Task<ResponseDTO> DeletaTarefa(ClaimsPrincipal user, Guid tarefaId)
+	{
+		var userId = user.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
+		var tarefaExistente = await _repository.TarefaRepository.FindAsync(tarefaId);
+		if (tarefaExistente == null)
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Tarefa não encontrada.",
+				StatusCode = StatusCodes.Status404NotFound,
+			};
+		}
+
+		if (userId != tarefaExistente.Usuario_id)
+		{
+			return new ResponseDTO
+			{
+				Status = "Erro",
+				Message = "Você não tem permissão para deletar essa tarefa.",
+				StatusCode = StatusCodes.Status403Forbidden,
+			};
+		}
+
+		_repository.TarefaRepository.Delete(tarefaExistente);
+		await _repository.CommitAsync();
+
+		return new ResponseDTO
+		{
+			Status = "Sucesso",
+			Message = "Tarefa deletada com sucesso.",
 			StatusCode = StatusCodes.Status200OK,
 		};
 	}
