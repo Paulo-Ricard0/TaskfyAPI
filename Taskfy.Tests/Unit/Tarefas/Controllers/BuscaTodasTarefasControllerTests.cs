@@ -16,6 +16,7 @@ namespace Taskfy.Tests.Unit.Tarefas.Controllers
 		[Fact]
 		public async Task DeveRetornar_200OK_AoBuscarTodasTarefas()
 		{
+			// Arrange
 			var userId = Guid.NewGuid().ToString();
 
 			var tarefasResponseDto = new List<TarefaDTO>
@@ -63,6 +64,7 @@ namespace Taskfy.Tests.Unit.Tarefas.Controllers
 		[Fact]
 		public async Task DeveRetornar_401Unauthorized_QuandoUserIdInvalido()
 		{
+			// Arrange
 			var responseTarefaUnauthorized = new ResponseDTO
 			{
 				Status = "Erro",
@@ -87,7 +89,8 @@ namespace Taskfy.Tests.Unit.Tarefas.Controllers
 		[Fact]
 		public async Task DeveRetornar_404NotFound_QuandoTarefasNaoEncontradas()
 		{
-			var responseTarefaUnauthorized = new ResponseDTO
+			// Arrange
+			var responseTarefasNotFound = new ResponseDTO
 			{
 				Status = "Erro",
 				Message = "Tarefas não encontradas.",
@@ -95,7 +98,7 @@ namespace Taskfy.Tests.Unit.Tarefas.Controllers
 			};
 
 			TarefaServiceMock.BuscaTodasTarefasAsync(Arg.Any<ClaimsPrincipal>())
-			.Returns(Task.FromResult(responseTarefaUnauthorized));
+			.Returns(Task.FromResult(responseTarefasNotFound));
 
 			var controller = new TarefaController(TarefaServiceMock);
 
@@ -105,7 +108,7 @@ namespace Taskfy.Tests.Unit.Tarefas.Controllers
 			// Assert
 			resultado.Should().NotBeNull();
 			resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-			resultado?.Value.Should().BeEquivalentTo(responseTarefaUnauthorized);
+			resultado?.Value.Should().BeEquivalentTo(responseTarefasNotFound);
 		}
 	}
 }
