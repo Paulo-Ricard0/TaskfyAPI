@@ -1,0 +1,78 @@
+Log:
+quinta-feira, 13 de junho de 2024 09:22:16
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 09:57:27
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 10:53:37
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 11:05:53
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 12:30:11
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 12:55:47
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 14:40:11
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 16:01:30
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 16:01:51
+Título do log: Tarefa
+Mensagem: Tarefa criada com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 16:59:03
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 17:07:08
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 17:10:05
+Título do log: Login - Sucesso
+Mensagem: Login efetuado com sucesso!
+-----------------------------------
+
+Log:
+quinta-feira, 13 de junho de 2024 17:10:48
+Título do log: Tarefa
+Mensagem: Tarefa criada com sucesso!
+-----------------------------------
+
