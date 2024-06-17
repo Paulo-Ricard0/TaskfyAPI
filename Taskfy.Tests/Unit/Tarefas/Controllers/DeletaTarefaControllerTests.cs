@@ -37,4 +37,31 @@ public class DeletaTarefaControllerTests : BaseControllerSetup
 		resultado?.StatusCode.Should().Be(StatusCodes.Status200OK);
 		resultado?.Value.Should().BeEquivalentTo(responseTarefaDeletada);
 	}
+
+	[Fact]
+	public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
+	{
+		// Arrange
+		var tarefaId = Guid.NewGuid();
+
+		var responseTarefaNotFound = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Tarefa não encontrada.",
+			StatusCode = StatusCodes.Status404NotFound,
+		};
+
+		TarefaServiceMock.DeletaTarefa(Arg.Any<ClaimsPrincipal>(), tarefaId)
+			.Returns(Task.FromResult(responseTarefaNotFound));
+
+		var controller = new TarefaController(TarefaServiceMock);
+
+		// Act
+		var resultado = await controller.DeletaTarefa(tarefaId) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+		resultado?.Value.Should().BeEquivalentTo(responseTarefaNotFound);
+	}
 }
