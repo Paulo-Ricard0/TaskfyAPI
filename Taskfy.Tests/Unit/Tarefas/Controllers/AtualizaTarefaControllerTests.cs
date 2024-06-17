@@ -59,4 +59,38 @@ public class AtualizaTarefaControllerTests : BaseControllerSetup
 		resultado?.Value.Should().BeEquivalentTo(responseTarefaAtualizada);
 	}
 
+	[Fact]
+	public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
+	{
+		// Arrange
+		var tarefaId = Guid.NewGuid();
+
+		var tarefaRequestUpdate = new TarefaRequestUpdateDTO
+		{
+			Titulo = "Tarefa Atualizada",
+			Descricao = "Descrição atualizada",
+			Data_vencimento = DateTime.Now.AddDays(3),
+			Status = true
+		};
+
+		var responseTarefaNotFound = new ResponseDTO
+		{
+			Status = "Erro",
+			Message = "Tarefa não encontrada.",
+			StatusCode = StatusCodes.Status404NotFound,
+		};
+
+		TarefaServiceMock.AtualizaTarefa(Arg.Any<ClaimsPrincipal>(), tarefaId, tarefaRequestUpdate)
+			.Returns(Task.FromResult(responseTarefaNotFound));
+
+		var controller = new TarefaController(TarefaServiceMock);
+
+		// Act
+		var resultado = await controller.AtualizaTarefa(tarefaId, tarefaRequestUpdate) as ObjectResult;
+
+		// Assert
+		resultado.Should().NotBeNull();
+		resultado?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+		resultado?.Value.Should().BeEquivalentTo(responseTarefaNotFound);
+	}
 }
