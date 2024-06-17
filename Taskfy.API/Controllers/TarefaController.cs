@@ -75,4 +75,18 @@ public class TarefaController : ControllerBase
 
 		return StatusCode(response.StatusCode, response);
 	}
+
+	[Authorize]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+	[ProducesDefaultResponseType]
+	[HttpDelete("{tarefaId}")]
+	public async Task<IActionResult> DeletaTarefa(Guid tarefaId)
+	{
+		var response = await _tarefaService.DeletaTarefa(User, tarefaId);
+
+		return StatusCode(response.StatusCode, response);
+	}
 }
