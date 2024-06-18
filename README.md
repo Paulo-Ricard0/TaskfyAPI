@@ -22,7 +22,7 @@
 
 ## 📋 Índice
 - [Visão Geral](#-visão-geral)
-- [Documentação](#%EF%B8%8F-documentação)
+- [Documentação](#-documentação)
 - [Diagrama de Sequência do sistema](#-diagrama-de-sequência-do-sistema)
 - [Funcionalidades](#%EF%B8%8F-funcionalidades)
 - [Testes](#-testes)
