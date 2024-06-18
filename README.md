@@ -22,8 +22,8 @@
 
 ## 📋 Índice
 - [Visão Geral](#-visão-geral)
-- [Documentação](#️-documentação)
-- [Diagrama de Sequência do sistema](#diagrama-de-Sequência-do-sistema)
+- [Documentação](#%EF%B8%8F-documentação)
+- [Diagrama de Sequência do sistema](#-diagrama-de-sequência-do-sistema)
 - [Funcionalidades](#%EF%B8%8F-funcionalidades)
 - [Testes](#-testes)
 - [Tecnologias utilizadas](#%EF%B8%8F-tecnologias-utilizadas)
