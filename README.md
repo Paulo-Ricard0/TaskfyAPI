@@ -42,7 +42,7 @@ Uma Web API desenvolvida em .NET 8 para o gerenciamento de tarefas e autenticaç
 
 ---
 
-## Diagrama de Sequência do sistema
+## 🧩 Diagrama de Sequência do sistema
 
 ```mermaid
 sequenceDiagram
