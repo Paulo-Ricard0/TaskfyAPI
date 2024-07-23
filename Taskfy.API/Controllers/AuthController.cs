@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
 	[Route("register")]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status409Conflict)]
-	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ResponseDTO), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(GlobalErrorResponseDTO), StatusCodes.Status500InternalServerError)]
 	[ProducesDefaultResponseType]
 	public async Task<IActionResult> Register([FromBody] RegistroModelDTO usuarioModel)
