@@ -12,6 +12,7 @@ using Taskfy.API.DTOs.Usuario;
 using Taskfy.API.Logs;
 using Taskfy.API.Models;
 using Taskfy.API.Services.Auth;
+using Taskfy.API.Services.MessagesQueue;
 
 namespace Taskfy.Tests.Unit.Auth.Services
 {
@@ -53,8 +54,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 				.Returns(CreateMockJwtToken());
 
 			var mockLogger = Substitute.For<ILog>();
+			var mockMessageQueue = Substitute.For<IMessageQueueService>();
 
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger, mockMessageQueue);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseLoginTokenDTO;
@@ -114,8 +116,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			var configuration = Substitute.For<IConfiguration>();
 			var mockTokenService = Substitute.For<ITokenService>();
 			var mockLogger = Substitute.For<ILog>();
+			var mockMessageQueue = Substitute.For<IMessageQueueService>();
 
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger, mockMessageQueue);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
@@ -155,8 +158,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var mockTokenService = Substitute.For<ITokenService>();
 			var mockLogger = Substitute.For<ILog>();
+			var mockMessageQueue = Substitute.For<IMessageQueueService>();
 
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger, mockMessageQueue);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
@@ -195,8 +199,9 @@ namespace Taskfy.Tests.Unit.Auth.Services
 
 			var mockTokenService = Substitute.For<ITokenService>();
 			var mockLogger = Substitute.For<ILog>();
+			var mockMessageQueue = Substitute.For<IMessageQueueService>();
 
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger, mockMessageQueue);
 
 			// Act
 			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
