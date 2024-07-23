@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 using System.Text;
 using Taskfy.API.Data;
 using Taskfy.API.DTOs.Mappings;
@@ -13,6 +14,7 @@ using Taskfy.API.Repositories;
 using Taskfy.API.Repositories.Tarefas;
 using Taskfy.API.Repositories.Usuarios;
 using Taskfy.API.Services.Auth;
+using Taskfy.API.Services.MessagesQueue;
 using Taskfy.API.Services.Tarefas;
 using Taskfy.API.UnitOfWork;
 
@@ -82,6 +84,20 @@ void ConfigureServices(IServiceCollection services, ConfigurationManager configu
 	services.AddScoped<ITarefaRepository, TarefaRepository>();
 	services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 	services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+	services.AddSingleton<IConnection>(_ =>
+	{
+		var factory = new ConnectionFactory() { HostName = "localhost" };
+		return factory.CreateConnection();
+	});
+
+	services.AddSingleton<IModel>(sp =>
+	{
+		var connection = sp.GetRequiredService<IConnection>();
+		return connection.CreateModel();
+	});
+
+	services.AddSingleton<IMessageQueueService, MessageQueueService>();
 
 	// Configura JWT Authentication
 	var jwtSettings = configuration.GetSection("JWT");
