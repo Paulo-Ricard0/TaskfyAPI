@@ -12,11 +12,11 @@ public class Tarefa
 
 	[Required]
 	[StringLength(100)]
-	public string Titulo { get; set; } = string.Empty;
+	public required string Titulo { get; set; }
 
 	[Required]
 	[StringLength(255)]
-	public string Descricao { get; set; } = string.Empty;
+	public required string Descricao { get; set; }
 
 	[Required]
 	public DateTime Data_vencimento { get; set; }
