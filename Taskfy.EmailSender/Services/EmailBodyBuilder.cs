@@ -50,6 +50,20 @@ public class EmailBodyBuilder : IEmailBodyBuilder
 			</br>
 			<h5>Você pode acessar a tarefa e gerenciá-la através do nosso aplicativo.</h5>
 			<p>Equipe Taskfy.</p>",
+			EmailType.TaskUpdated => $@"
+			<h2>Olá {emailDetails.UserName}!</h2>
+			</br>
+			<h3>A tarefa a seguir foi atualizada em sua conta no Taskfy.</h3>
+			</br>
+			<p>Aqui estão os detalhes atualizados da tarefa:</p>
+			<ul>
+				<li>Título: {emailDetails.TituloTarefa}</li>
+				<li>Descrição: {emailDetails.DescricaoTarefa}</li>
+				<li>Data de vencimento: {emailDetails.DataVencimentoFormatada}</li>
+			</ul>
+			</br>
+			<h5>Você pode acessar a tarefa e verificar as atualizações através do nosso aplicativo.</h5>
+			<p>Equipe Taskfy.</p>",
 			_ => "<h1>Olá! por favor, desconsidere esse e-mail.</h1>"
 		};
 	}
