@@ -7,6 +7,10 @@ public class EmailBodyBuilder : IEmailBodyBuilder
 {
 	public BodyBuilder Build(EmailDetails emailDetails)
 	{
+		var dataFormatada = emailDetails.DataVencimentoTarefa.ToString("dd/MM/yyyy");
+
+		emailDetails.DataVencimentoFormatada = dataFormatada;
+
 		var bodyBuilder = new BodyBuilder
 		{
 			HtmlBody = GetEmailBody(emailDetails)

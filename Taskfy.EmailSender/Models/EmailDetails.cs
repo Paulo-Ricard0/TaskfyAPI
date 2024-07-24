@@ -6,5 +6,6 @@ public class EmailDetails
 	public EmailType Type { get; set; }
 	public string? TituloTarefa { get; set; }
 	public string? DescricaoTarefa { get; set; }
-	public string? DataVencimentoTarefa { get; set; }
+	public DateTime DataVencimentoTarefa { get; set; }
+	public string? DataVencimentoFormatada { get; set; }
 }

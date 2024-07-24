@@ -30,7 +30,7 @@ public class EmailService : IEmailService
 		}
 
 		var email = new MimeMessage();
-		email.From.Add(new MailboxAddress(smtpSettings!.Name, smtpSettings.FromEmail));
+		email.From.Add(new MailboxAddress(smtpSettings.Name, smtpSettings.FromEmail));
 		email.To.Add(new MailboxAddress(emailMessage.Body.UserName, emailMessage.To));
 		email.Subject = emailMessage.Subject;
 
