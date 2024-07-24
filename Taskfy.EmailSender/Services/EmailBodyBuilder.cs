@@ -64,6 +64,19 @@ public class EmailBodyBuilder : IEmailBodyBuilder
 			</br>
 			<h5>Você pode acessar a tarefa e verificar as atualizações através do nosso aplicativo.</h5>
 			<p>Equipe Taskfy.</p>",
+			EmailType.TaskDeleted => $@"
+			<h2>Olá {emailDetails.UserName}!</h2>
+			</br>
+			<h3>A tarefa a seguir foi excluída da sua conta no Taskfy.</h3>
+			</br>
+			<p>Aqui estão os detalhes da tarefa excluída:</p>
+			<ul>
+				<li>Título: {emailDetails.TituloTarefa}</li>
+				<li>Descrição: {emailDetails.DescricaoTarefa}</li>
+			</ul>
+			</br>
+			<h5>Se essa exclusão foi um engano, você pode recriar a tarefa através do nosso aplicativo.</h5>
+			<p>Equipe Taskfy.</p>",
 			_ => "<h1>Olá! por favor, desconsidere esse e-mail.</h1>"
 		};
 	}
