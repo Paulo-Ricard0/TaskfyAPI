@@ -50,7 +50,7 @@ namespace Taskfy.Tests.Unit.Auth.Services
 		public async Task QuandoUsuarioExistir_Retorna_409Conflict()
 		{
 			// Arrange
-			var UsuarioExistente = new Usuario { Email = "test@gmail.com" };
+			var UsuarioExistente = new Usuario { Email = "test@gmail.com", Name = "Teste" };
 
 			var usuarioModel = new RegistroModelDTO
 			{
