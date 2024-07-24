@@ -9,9 +9,9 @@ public class EmailService : IEmailService
 		return notificationType switch
 		{
 			NotificationType.UserCreated => "Bem-vindo ao Taskfy!",
-			NotificationType.TaskCreated => $"Nova tarefa criada: {tituloTarefa}",
-			NotificationType.TaskUpdated => $"Tarefa atualizada: {tituloTarefa}",
-			NotificationType.TaskDeleted => $"Tarefa deletada: {tituloTarefa}",
+			NotificationType.TaskCreated => $"Nova Tarefa Criada: {tituloTarefa}",
+			NotificationType.TaskUpdated => $"Tarefa Atualizada: {tituloTarefa}",
+			NotificationType.TaskDeleted => $"Tarefa Excluída: {tituloTarefa}",
 			_ => "Notificação Taskfy"
 		};
 	}
