@@ -23,13 +23,34 @@ public class EmailBodyBuilder : IEmailBodyBuilder
 		return emailDetails.Type switch
 		{
 			EmailType.UserCreated => $@"
-			<h1>Olá {emailDetails.UserName}!</h1>
-			<p>Estamos	muito felizes em tê-lo(a) conosco no Taskfy!</p>
-			<p>Aqui estão algumas dicas para começar:</p>
-			<p>Crie suas primeiras tarefas e organize seu dia. Explore nossas funcionalidades para gerenciar suas tarefas de forma eficiente. Se precisar de qualquer ajuda, não hesite em entrar em contato conosco.</p>
-			<p>Bem-vindo(a) a bordo!</p>
-			<p>Atenciosamente, Equipe Taskfy</p>",
-			_ => "<h1>Desconsidere esse e-mail.</h1>"
+			<h2>Olá {emailDetails.UserName}!</h2>
+			</br>
+			<h3>Estamos muito felizes em tê-lo(a) conosco no Taskfy!</h3>
+			</br>
+			<h4>Aqui estão algumas dicas para começar:</h4>
+			<ul>
+				<li>Crie suas primeiras tarefas e organize seu dia.</li>
+				<li>Explore nossas funcionalidades para gerenciar suas tarefas de forma eficiente.</li>
+				<li>Se precisar de qualquer ajuda, não hesite em entrar em contato conosco.</li>
+			</ul>
+			</br>
+			<h5>Bem-vindo(a) a bordo!</h5>
+			<p>Equipe Taskfy.</p>",
+			EmailType.TaskCreated => $@"
+			<h2>Olá {emailDetails.UserName}!</h2>
+			</br>
+			<h3>Uma nova tarefa foi criada em sua conta no Taskfy.</h3>
+			</br>
+			<p>Aqui estão os detalhes da tarefa:</p>
+			<ul>
+				<li>Título: {emailDetails.TituloTarefa}</li>
+				<li>Descrição: {emailDetails.DescricaoTarefa}</li>
+				<li>Data de vencimento: {emailDetails.DataVencimentoFormatada}</li>
+			</ul>
+			</br>
+			<h5>Você pode acessar a tarefa e gerenciá-la através do nosso aplicativo.</h5>
+			<p>Equipe Taskfy.</p>",
+			_ => "<h1>Olá! por favor, desconsidere esse e-mail.</h1>"
 		};
 	}
 }

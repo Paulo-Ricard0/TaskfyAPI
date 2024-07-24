@@ -20,7 +20,6 @@ public class EmailService : IEmailService
 
 	public async Task SendEmailAsync(EmailMessage emailMessage)
 	{
-
 		var smtpSettings = _configuration.GetSection("SmtpSettings").Get<SmtpSettings>();
 
 		if (smtpSettings == null)
