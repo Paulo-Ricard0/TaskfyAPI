@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System.Text;
+using Taskfy.API.DTOs.Tarefas;
+using Taskfy.API.DTOs.Usuario;
 
 namespace Taskfy.API.Services.MessagesQueue;
 
@@ -23,7 +25,7 @@ public class MessageQueueService : IMessageQueueService
 		_channel = channel;
 	}
 
-	public void PublishUserCreatedMessage(string userName, string email)
+	public void PublishUserCreated(string userName, string email)
 	{
 		var message = new
 		{
@@ -35,17 +37,27 @@ public class MessageQueueService : IMessageQueueService
 		PublishMessage("taskfy_notification_queue", message);
 	}
 
-	public void PublishTaskCreatedMessage(string userName, string email, string tituloTarefa, string descricaoTarefa, string dataVencimentoTarefa)
+	public void PublishTaskCreated(UserProjection usuario, TarefaDTO tarefa)
+	{
+		var message = new
+		{
+			UserName = usuario.Name,
+			ToEmail = usuario.Email,
+			Type = NotificationType.TaskCreated,
+			TituloTarefa = tarefa.Titulo,
+			DescricaoTarefa = tarefa.Descricao,
+			DataVencimentoTarefa = tarefa.Data_vencimento
+		};
+
+		PublishMessage("taskfy_notification_queue", message);
+	}
+
+	public void PublishTaskUpdated(UserProjection usuario, TarefaDTO tarefa)
 	{
 		throw new NotImplementedException();
 	}
 
-	public void PublishTaskDeletedMessage(string userName, string email, string tituloTarefa)
-	{
-		throw new NotImplementedException();
-	}
-
-	public void PublishTaskUpdatedMessage(string userName, string email, string tituloTarefa, string descricaoTarefa, string dataVencimentoTarefa)
+	public void PublishTaskDeleted(UserProjection usuario, TarefaDTO tarefa)
 	{
 		throw new NotImplementedException();
 	}

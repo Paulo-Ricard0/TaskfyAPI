@@ -1,9 +1,12 @@
-﻿namespace Taskfy.API.Services.MessagesQueue;
+﻿using Taskfy.API.DTOs.Tarefas;
+using Taskfy.API.DTOs.Usuario;
+
+namespace Taskfy.API.Services.MessagesQueue;
 
 public interface IMessageQueueService
 {
-	void PublishUserCreatedMessage(string userName, string email);
-	void PublishTaskCreatedMessage(string userName, string email, string tituloTarefa, string descricaoTarefa, string dataVencimentoTarefa);
-	void PublishTaskUpdatedMessage(string userName, string email, string tituloTarefa, string descricaoTarefa, string dataVencimentoTarefa);
-	void PublishTaskDeletedMessage(string userName, string email, string tituloTarefa);
+	void PublishUserCreated(string userName, string email);
+	void PublishTaskCreated(UserProjection usuario, TarefaDTO tarefa);
+	void PublishTaskUpdated(UserProjection usuario, TarefaDTO tarefa);
+	void PublishTaskDeleted(UserProjection usuario, TarefaDTO tarefa);
 }
