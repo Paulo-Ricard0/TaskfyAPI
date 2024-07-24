@@ -54,7 +54,17 @@ public class MessageQueueService : IMessageQueueService
 
 	public void PublishTaskUpdated(UserProjection usuario, TarefaDTO tarefa)
 	{
-		throw new NotImplementedException();
+		var message = new
+		{
+			UserName = usuario.Name,
+			ToEmail = usuario.Email,
+			Type = NotificationType.TaskUpdated,
+			TituloTarefa = tarefa.Titulo,
+			DescricaoTarefa = tarefa.Descricao,
+			DataVencimentoTarefa = tarefa.Data_vencimento
+		};
+
+		PublishMessage("taskfy_notification_queue", message);
 	}
 
 	public void PublishTaskDeleted(UserProjection usuario, TarefaDTO tarefa)

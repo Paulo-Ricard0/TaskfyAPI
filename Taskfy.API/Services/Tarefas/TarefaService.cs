@@ -177,6 +177,16 @@ public class TarefaService : ITarefaService
 
 		var responseTarefaAtualizadaDTO = _mapper.Map<TarefaDTO>(tarefaAtualizada);
 
+		var usuario = await _repository.UsuarioRepository
+			.FilterByIdAsync(u => u.Id == userId, u => new UserProjection { Name = u.Name, Email = u.Email! });
+
+		if (usuario != null)
+		{
+			_messageQueueService.PublishTaskUpdated(usuario, responseTarefaAtualizadaDTO);
+		}
+
+		_logger.LogToFile("Tarefa", "Tarefa atualizada com sucesso!");
+
 		return new TarefaResponseDTO<TarefaDTO>
 		{
 			Data = responseTarefaAtualizadaDTO,
