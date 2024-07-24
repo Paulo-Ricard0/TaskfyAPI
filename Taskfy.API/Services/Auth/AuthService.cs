@@ -47,7 +47,7 @@ public class AuthService : IAuthService
 
 		if (registraUsuario.Succeeded)
 		{
-			_messageQueueService.PublishUserCreatedMessage(usuario.Name, usuario.Email);
+			_messageQueueService.PublishUserCreated(usuario.Name, usuario.Email);
 
 			return new ResponseDTO
 			{
@@ -124,8 +124,6 @@ public class AuthService : IAuthService
 
 		var authClaims = new List<Claim>
 	{
-		new Claim(ClaimTypes.Name, usuario.Name),
-		new Claim(ClaimTypes.Email, usuario.Email!),
 		new Claim("UserId", usuario.Id),
 		new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 	};
