@@ -30,6 +30,7 @@ public class NotificationHandler : INotificationHandler
 		};
 
 		var serializedMessage = JsonConvert.SerializeObject(emailMessage);
+
 		_logger.LogInformation("[x] - Email message: {emailMessage} - {DateTime}", serializedMessage, DateTime.Now);
 
 		var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(emailMessage));

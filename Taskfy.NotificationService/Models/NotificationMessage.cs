@@ -6,5 +6,5 @@ public class NotificationMessage
 	public NotificationType Type { get; set; }
 	public string? TituloTarefa { get; set; }
 	public string? DescricaoTarefa { get; set; }
-	public string? DataVencimentoTarefa { get; set; }
+	public DateTime DataVencimentoTarefa { get; set; }
 }
