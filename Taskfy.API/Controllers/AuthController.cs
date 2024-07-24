@@ -5,7 +5,7 @@ using Taskfy.API.Services.Auth;
 
 namespace Taskfy.API.Controllers;
 
-[Route("api/users/")]
+[Route("api/auth/")]
 [ApiController]
 [Produces("application/json")]
 public class AuthController : ControllerBase
