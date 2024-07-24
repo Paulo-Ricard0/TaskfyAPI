@@ -5,8 +5,10 @@ using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Tarefas;
 using Taskfy.API.DTOs.Tarefas.Request;
 using Taskfy.API.DTOs.Tarefas.Response;
+using Taskfy.API.DTOs.Usuario;
 using Taskfy.API.Logs;
 using Taskfy.API.Models;
+using Taskfy.API.Services.MessagesQueue;
 using Taskfy.API.UnitOfWork;
 
 namespace Taskfy.API.Services.Tarefas;
@@ -16,12 +18,14 @@ public class TarefaService : ITarefaService
 	private readonly IUnitOfWork _repository;
 	private readonly ILog _logger;
 	private readonly IMapper _mapper;
+	private readonly IMessageQueueService _messageQueueService;
 
-	public TarefaService(IUnitOfWork repository, ILog logger, IMapper mapper)
+	public TarefaService(IUnitOfWork repository, ILog logger, IMapper mapper, IMessageQueueService messageQueueService)
 	{
 		_repository = repository;
 		_logger = logger;
 		_mapper = mapper;
+		_messageQueueService = messageQueueService;
 	}
 
 	public async Task<ResponseDTO> CriaTarefaAsync(TarefaRequestDTO tarefaModel, ClaimsPrincipal user)
@@ -55,7 +59,16 @@ public class TarefaService : ITarefaService
 
 		var responseTarefaDTO = _mapper.Map<TarefaDTO>(novaTarefa);
 
+		var usuario = await _repository.UsuarioRepository
+			.FilterByIdAsync(u => u.Id == userId, u => new UserProjection { Name = u.Name, Email = u.Email! });
+
+		if (usuario != null)
+		{
+			_messageQueueService.PublishTaskCreated(usuario, responseTarefaDTO);
+		}
+
 		_logger.LogToFile("Tarefa", "Tarefa criada com sucesso!");
+
 		return new TarefaResponseDTO<TarefaDTO>
 		{
 			Data = responseTarefaDTO,
