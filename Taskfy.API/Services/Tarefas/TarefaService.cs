@@ -222,6 +222,17 @@ public class TarefaService : ITarefaService
 		_repository.TarefaRepository.Delete(tarefaExistente);
 		await _repository.CommitAsync();
 
+		var usuario = await _repository.UsuarioRepository
+			.FilterByIdAsync(u => u.Id == userId, u => new UserProjection { Name = u.Name, Email = u.Email! });
+
+		if (usuario != null)
+		{
+			var TarefaDeletadaDTO = _mapper.Map<TarefaDTO>(tarefaExistente);
+			_messageQueueService.PublishTaskDeleted(usuario, TarefaDeletadaDTO);
+		}
+
+		_logger.LogToFile("Tarefa", "Tarefa deletada com sucesso!");
+
 		return new ResponseDTO
 		{
 			Status = "Sucesso",

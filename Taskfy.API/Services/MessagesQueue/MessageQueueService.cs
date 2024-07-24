@@ -69,7 +69,16 @@ public class MessageQueueService : IMessageQueueService
 
 	public void PublishTaskDeleted(UserProjection usuario, TarefaDTO tarefa)
 	{
-		throw new NotImplementedException();
+		var message = new
+		{
+			UserName = usuario.Name,
+			ToEmail = usuario.Email,
+			Type = NotificationType.TaskDeleted,
+			TituloTarefa = tarefa.Titulo,
+			DescricaoTarefa = tarefa.Descricao,
+		};
+
+		PublishMessage("taskfy_notification_queue", message);
 	}
 
 	private void PublishMessage(string queueName, object message)
