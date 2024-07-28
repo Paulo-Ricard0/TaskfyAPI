@@ -2,108 +2,83 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
-using Taskfy.API.Controllers;
 using Taskfy.API.DTOs;
-using Taskfy.API.DTOs.Usuario;
-using Taskfy.API.Services.Auth;
+using Taskfy.Tests.Unit.Auth.Controllers.BaseMocks;
+using Taskfy.Tests.Unit.ServicesMocks;
 
 namespace Taskfy.Tests.Unit.Auth.Controllers;
 
-public class RegisterControllerTests
+public class RegisterControllerTests : BaseAuthControllerSetup
 {
 	[Fact]
-	public async Task Verifica_UsuarioCriado_Retorna201CreatedStatusCode()
+	public async Task DeveRetornar_201Created_QuandoUsuarioCriado()
 	{
 		// Arrange
-		var usuarioModel = new RegistroModelDTO
-		{
-			Name = "testuser test",
-			Email = "test@gmail.com",
-			Password = "Test123@"
-		};
+		var registroRequestDto = MocksData.User.GetRegistroRequestDTO();
 
-		var responseDto = new ResponseDTO
+		var response = new ResponseDTO
 		{
 			Status = "Sucesso",
 			Message = "Usuário criado com sucesso!",
 			StatusCode = StatusCodes.Status201Created
 		};
 
-		var authService = Substitute.For<IAuthService>();
-		authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
-
-		var controller = new AuthController(authService);
+		AuthServiceMock.RegisterAsync(registroRequestDto).Returns(Task.FromResult(response));
 
 		// Act
-		var resultado = await controller.Register(usuarioModel) as ObjectResult;
+		var resultado = await AuthControllerMock.Register(registroRequestDto) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();
 		resultado?.StatusCode.Should().Be(StatusCodes.Status201Created);
-		resultado?.Value.Should().BeEquivalentTo(responseDto);
+		resultado?.Value.Should().BeEquivalentTo(response);
 	}
 
 	[Fact]
-	public async Task Verifica_Retorno409Conflict_QuandoUsuarioExistir()
+	public async Task DeveRetornar_409Conflict_QuandoUsuarioExistir()
 	{
 		// Arrange
-		var usuarioModel = new RegistroModelDTO
-		{
-			Name = "testuser",
-			Email = "test@gmail.com",
-			Password = "Test123@"
-		};
+		var registroRequestDto = MocksData.User.GetRegistroRequestDTO();
 
-		var responseDto = new ResponseDTO
+		var response = new ResponseDTO
 		{
 			Status = "Erro",
 			Message = "Usuário já registrado!",
 			StatusCode = StatusCodes.Status409Conflict
 		};
 
-		var authService = Substitute.For<IAuthService>();
-		authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
-
-		var controller = new AuthController(authService);
+		AuthServiceMock.RegisterAsync(registroRequestDto).Returns(Task.FromResult(response));
 
 		// Act
-		var resultado = await controller.Register(usuarioModel) as ObjectResult;
+		var resultado = await AuthControllerMock.Register(registroRequestDto) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();
 		resultado?.StatusCode.Should().Be(StatusCodes.Status409Conflict);
-		resultado?.Value.Should().BeEquivalentTo(responseDto);
+		resultado?.Value.Should().BeEquivalentTo(response);
 	}
 
 	[Fact]
-	public async Task Verifica_Retorno500_QuandoErroInternoOcorre()
+	public async Task DeveRetornar_Erro500_QuandoErroInternoOcorrer()
 	{
 		// Arrange
-		var usuarioModel = new RegistroModelDTO
-		{
-			Name = "testuser",
-			Email = "test@gmail.com",
-			Password = "Test123@"
-		};
+		var registroRequestDto = MocksData.User.GetRegistroRequestDTO();
 
-		var responseDto = new ResponseDTO
+		var response = new ResponseDTO
 		{
 			Status = "Erro",
 			Message = "Falha na criação de usuário.",
 			StatusCode = StatusCodes.Status500InternalServerError
 		};
 
-		var authService = Substitute.For<IAuthService>();
-		authService.RegisterAsync(usuarioModel).Returns(Task.FromResult(responseDto));
-
-		var controller = new AuthController(authService);
+		AuthServiceMock.RegisterAsync(registroRequestDto).Returns(Task.FromResult(response));
 
 		// Act
-		var resultado = await controller.Register(usuarioModel) as ObjectResult;
+		var resultado = await AuthControllerMock.Register(registroRequestDto) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();
 		resultado?.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		resultado?.Value.Should().BeEquivalentTo(responseDto);
+		resultado?.Value.Should().BeEquivalentTo(response);
 	}
 }

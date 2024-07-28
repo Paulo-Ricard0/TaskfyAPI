@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using System.Security.Claims;
-using Taskfy.API.Controllers;
 using Taskfy.API.DTOs;
+using Taskfy.Tests.Unit.ServicesMocks;
 using Taskfy.Tests.Unit.Tarefas.Controllers.Mocks;
 
 namespace Taskfy.Tests.Unit.Tarefas.Controllers;
 
-public class DeletaTarefaControllerTests : BaseControllerSetup
+public class DeletaTarefaControllerTests : BaseTarefaControllerSetup
 {
 	[Fact]
 	public async Task DeveRetornar_200OK_AoDeletarTarefa()
 	{
 		// Arrange
-		var tarefaId = Guid.NewGuid();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
 		var responseTarefaDeletada = new ResponseDTO
 		{
@@ -27,10 +27,8 @@ public class DeletaTarefaControllerTests : BaseControllerSetup
 		TarefaServiceMock.DeletaTarefa(Arg.Any<ClaimsPrincipal>(), tarefaId)
 			.Returns(Task.FromResult(responseTarefaDeletada));
 
-		var controller = new TarefaController(TarefaServiceMock);
-
 		// Act
-		var resultado = await controller.DeletaTarefa(tarefaId) as ObjectResult;
+		var resultado = await TarefaControllerMock.DeletaTarefa(tarefaId) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();
@@ -42,7 +40,7 @@ public class DeletaTarefaControllerTests : BaseControllerSetup
 	public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
 	{
 		// Arrange
-		var tarefaId = Guid.NewGuid();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
 		var responseTarefaNotFound = new ResponseDTO
 		{
@@ -54,10 +52,8 @@ public class DeletaTarefaControllerTests : BaseControllerSetup
 		TarefaServiceMock.DeletaTarefa(Arg.Any<ClaimsPrincipal>(), tarefaId)
 			.Returns(Task.FromResult(responseTarefaNotFound));
 
-		var controller = new TarefaController(TarefaServiceMock);
-
 		// Act
-		var resultado = await controller.DeletaTarefa(tarefaId) as ObjectResult;
+		var resultado = await TarefaControllerMock.DeletaTarefa(tarefaId) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();
