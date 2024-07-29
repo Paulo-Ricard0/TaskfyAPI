@@ -1,42 +1,26 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
-using Taskfy.API.DTOs.Usuario;
-using Taskfy.API.Logs;
 using Taskfy.API.Models;
-using Taskfy.API.Services.Auth;
+using Taskfy.Tests.Unit.Auth.Services.Mocks;
+using Taskfy.Tests.Unit.ServicesMocks;
 
 namespace Taskfy.Tests.Unit.Auth.Services
 {
-	public class RegisterServiceTests
+	public class RegisterServiceTests : BaseUserServiceSetup
 	{
 		[Fact]
-		public async Task QuandoUsuarioNaoExiste_CriaUsuarioComSucesso201Created()
+		public async Task DeveRetornar_200OK_QuandoRegistrarUsuario()
 		{
 			// Arrange
-			var usuarioModel = new RegistroModelDTO
-			{
-				Name = "testuser test",
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			var registroRequestDTO = MocksData.User.GetRegistroRequestDTO();
 
-			var userManager = Substitute.For<UserManager<Usuario>>(
-				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
-
-			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(null));
-			userManager.CreateAsync(Arg.Any<Usuario>(), usuarioModel.Password).Returns(Task.FromResult(IdentityResult.Success));
-
-			var configuration = Substitute.For<IConfiguration>();
-			var mockTokenService = Substitute.For<ITokenService>();
-			var mockLogger = Substitute.For<ILog>();
-
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			UserManagerMock.FindByEmailAsync(registroRequestDTO.Email).Returns(Task.FromResult<Usuario?>(null));
+			UserManagerMock.CreateAsync(Arg.Any<Usuario>(), registroRequestDTO.Password).Returns(Task.FromResult(IdentityResult.Success));
 
 			// Act
-			var resultado = await authService.RegisterAsync(usuarioModel);
+			var resultado = await AuthServiceMock.RegisterAsync(registroRequestDTO);
 
 			// Assert
 			resultado.StatusCode.Should().Be(StatusCodes.Status201Created);
@@ -45,31 +29,17 @@ namespace Taskfy.Tests.Unit.Auth.Services
 		}
 
 		[Fact]
-		public async Task QuandoUsuarioExistir_Retorna_409Conflict()
+		public async Task DeveRetornar_409Conflict_QuandoUsuarioExistente()
 		{
 			// Arrange
-			var UsuarioExistente = new Usuario { Email = "test@gmail.com" };
+			var UsuarioExistente = MocksData.User.GetUsuario();
 
-			var usuarioModel = new RegistroModelDTO
-			{
-				Name = "testuser test",
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			var registroRequestDTO = MocksData.User.GetRegistroRequestDTO();
 
-			var userManager = Substitute.For<UserManager<Usuario>>(
-				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
-
-			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(UsuarioExistente));
-
-			var configuration = Substitute.For<IConfiguration>();
-			var mockTokenService = Substitute.For<ITokenService>();
-			var mockLogger = Substitute.For<ILog>();
-
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			UserManagerMock.FindByEmailAsync(registroRequestDTO.Email).Returns(Task.FromResult<Usuario?>(UsuarioExistente));
 
 			// Act
-			var resultado = await authService.RegisterAsync(usuarioModel);
+			var resultado = await AuthServiceMock.RegisterAsync(registroRequestDTO);
 
 			// Assert
 			resultado.Status.Should().Be("Erro");
@@ -78,30 +48,16 @@ namespace Taskfy.Tests.Unit.Auth.Services
 		}
 
 		[Fact]
-		public async Task QuandoFalhaNoRegistro_Retorna_500InternalServerError()
+		public async Task DeveRetornar_Erro500_QuandoFalhaNoRegistro()
 		{
 			// Arrange
-			var usuarioModel = new RegistroModelDTO
-			{
-				Name = "testuser test",
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
-
-			var userManager = Substitute.For<UserManager<Usuario>>(
-				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
+			var registroRequestDTO = MocksData.User.GetRegistroRequestDTO();
 
 			var identityResult = IdentityResult.Failed(new IdentityError { Description = "Erro na criação do usuário." });
-			userManager.CreateAsync(Arg.Any<Usuario>(), usuarioModel.Password).Returns(Task.FromResult(identityResult));
-
-			var configuration = Substitute.For<IConfiguration>();
-			var mockTokenService = Substitute.For<ITokenService>();
-			var mockLogger = Substitute.For<ILog>();
-
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			UserManagerMock.CreateAsync(Arg.Any<Usuario>(), registroRequestDTO.Password).Returns(Task.FromResult(identityResult));
 
 			// Act
-			var resultado = await authService.RegisterAsync(usuarioModel);
+			var resultado = await AuthServiceMock.RegisterAsync(registroRequestDTO);
 
 			// Assert
 			resultado.Status.Should().Be("Erro");

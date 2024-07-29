@@ -27,12 +27,23 @@ public class Repository<T> : IRepository<T> where T : class
 
 	public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate)
 	{
-		return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate);
+		return await _context.Set<T>()
+			.AsNoTracking()
+			.FirstOrDefaultAsync(predicate);
 	}
 
 	public async Task<T?> FindAsync(params object[] keyValues)
 	{
 		return await _context.Set<T>().FindAsync(keyValues);
+	}
+
+	public async Task<TProjection?> FilterByIdAsync<TProjection>(Expression<Func<T, bool>> predicate, Expression<Func<T, TProjection>> projection)
+	{
+		return await _context.Set<T>()
+			.AsNoTracking()
+			.Where(predicate)
+			.Select(projection)
+			.FirstOrDefaultAsync();
 	}
 
 	public T Create(T entity)

@@ -8,10 +8,10 @@ public class TarefaDTO
 	public Guid Id { get; set; }
 
 	[Required]
-	public string Titulo { get; set; } = string.Empty;
+	public required string Titulo { get; set; }
 
 	[Required]
-	public string Descricao { get; set; } = string.Empty;
+	public required string Descricao { get; set; }
 
 	[Required]
 	public DateTime Data_vencimento { get; set; }

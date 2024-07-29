@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskfy.API", "Taskfy.API\Taskfy.API.csproj", "{E306A9F9-2FFF-4060-9105-103FA9544437}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taskfy.API", "Taskfy.API\Taskfy.API.csproj", "{E306A9F9-2FFF-4060-9105-103FA9544437}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskfy.Tests", "Taskfy.Tests\Taskfy.Tests.csproj", "{64154F2B-1B9C-4CDA-8775-B53218FA64E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taskfy.Tests", "Taskfy.Tests\Taskfy.Tests.csproj", "{64154F2B-1B9C-4CDA-8775-B53218FA64E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskfy.NotificationService", "Taskfy.NotificationService\Taskfy.NotificationService.csproj", "{46C643E7-5577-4D0B-A188-E38788B8A686}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskfy.EmailSender", "Taskfy.EmailSender\Taskfy.EmailSender.csproj", "{B2ADFE7D-925B-49A5-B929-7A23BAE6E248}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{64154F2B-1B9C-4CDA-8775-B53218FA64E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64154F2B-1B9C-4CDA-8775-B53218FA64E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64154F2B-1B9C-4CDA-8775-B53218FA64E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46C643E7-5577-4D0B-A188-E38788B8A686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46C643E7-5577-4D0B-A188-E38788B8A686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46C643E7-5577-4D0B-A188-E38788B8A686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46C643E7-5577-4D0B-A188-E38788B8A686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2ADFE7D-925B-49A5-B929-7A23BAE6E248}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2ADFE7D-925B-49A5-B929-7A23BAE6E248}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2ADFE7D-925B-49A5-B929-7A23BAE6E248}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2ADFE7D-925B-49A5-B929-7A23BAE6E248}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

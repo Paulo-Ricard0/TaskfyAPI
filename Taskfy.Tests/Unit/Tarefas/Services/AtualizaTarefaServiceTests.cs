@@ -1,80 +1,41 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
-using System.Security.Claims;
 using Taskfy.API.DTOs.Tarefas;
-using Taskfy.API.DTOs.Tarefas.Request;
 using Taskfy.API.DTOs.Tarefas.Response;
 using Taskfy.API.Models;
-using Taskfy.API.Services.Tarefas;
+using Taskfy.Tests.Unit.ServicesMocks;
 using Taskfy.Tests.Unit.Tarefas.Services.Mocks;
 
 namespace Taskfy.Tests.Unit.Tarefas.Services;
 
-public class AtualizaTarefaServiceTests : BaseServiceSetup
+public class AtualizaTarefaServiceTests : BaseTarefaServiceSetup
 {
 	[Fact]
 	public async Task DeveRetornar_200OK_QuandoAtualizarTarefa()
 	{
 		// Arrange
-		var userId = Guid.NewGuid().ToString();
-		var tarefaId = Guid.NewGuid();
+		var userId = MocksData.User.GetUserId();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
-		var claims = new[]
-		{
-			new Claim("UserId", userId)
-		};
+		var claimsPrincipal = MocksData.User.GetClaimsPrincipal(userId);
 
-		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+		var tarefaRequestUpdate = MocksData.Tarefa.GetTarefaRequestUpdateDTO();
 
-		var tarefaRequestUpdate = new TarefaRequestUpdateDTO
-		{
-			Titulo = "Tarefa Atualizada",
-			Descricao = "Descrição atualizada",
-			Data_vencimento = DateTime.Now.AddDays(3),
-			Status = true
-		};
+		var tarefaExistente = MocksData.Tarefa.GetTarefa(tarefaId, userId);
 
-		var tarefaExistente = new Tarefa
-		{
-			Id = tarefaId,
-			Titulo = "Tarefa Existente",
-			Descricao = "Descrição da tarefa existente",
-			Data_vencimento = DateTime.Now.AddDays(2),
-			Status = false,
-			Usuario_id = userId
-		};
+		var tarefaAtualizada = MocksData.Tarefa.GetTarefaAtualizada(tarefaId, tarefaRequestUpdate, userId);
 
-		var tarefaAtualizada = new Tarefa
-		{
-			Id = tarefaId,
-			Titulo = tarefaRequestUpdate.Titulo,
-			Descricao = tarefaRequestUpdate.Descricao,
-			Data_vencimento = tarefaRequestUpdate.Data_vencimento,
-			Status = tarefaRequestUpdate.Status,
-			Usuario = null,
-			Usuario_id = userId
-		};
+		var tarefaResponseDTO = MocksData.Tarefa.GetTarefaDTO(tarefaAtualizada);
 
-		var tarefaResponseDTO = new TarefaDTO
-		{
-			Id = tarefaAtualizada.Id,
-			Titulo = tarefaAtualizada.Titulo,
-			Descricao = tarefaAtualizada.Descricao,
-			Data_vencimento = tarefaAtualizada.Data_vencimento,
-			Status = tarefaAtualizada.Status,
-			Usuario_id = tarefaAtualizada.Usuario_id
-		};
+		MapperMock.Map<TarefaDTO>(tarefaAtualizada).Returns(tarefaResponseDTO);
 
 		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(tarefaExistente);
 		UnitOfWorkMock.TarefaRepository.Update(tarefaExistente).Returns(tarefaAtualizada);
 		UnitOfWorkMock.CommitAsync().Returns(Task.CompletedTask);
-		MapperMock.Map<TarefaDTO>(tarefaAtualizada).Returns(tarefaResponseDTO);
-
-		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
 
 		// Act
-		var resultado = await tarefaService.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate) as TarefaResponseDTO<TarefaDTO>;
+		var resultado = await TarefaServiceMock.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate) as TarefaResponseDTO<TarefaDTO>;
 
 		// Assert
 		resultado.Should().NotBeNull();
@@ -89,30 +50,17 @@ public class AtualizaTarefaServiceTests : BaseServiceSetup
 	public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
 	{
 		// Arrange
-		var userId = Guid.NewGuid().ToString();
-		var tarefaId = Guid.NewGuid();
+		var userId = MocksData.User.GetUserId();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
-		var claims = new[]
-		{
-			new Claim("UserId", userId)
-		};
+		var claimsPrincipal = MocksData.User.GetClaimsPrincipal(userId);
 
-		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
-
-		var tarefaRequestUpdate = new TarefaRequestUpdateDTO
-		{
-			Titulo = "Tarefa Atualizada",
-			Descricao = "Descrição atualizada",
-			Data_vencimento = DateTime.Now.AddDays(3),
-			Status = true
-		};
+		var tarefaRequestUpdate = MocksData.Tarefa.GetTarefaRequestUpdateDTO();
 
 		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(Task.FromResult<Tarefa?>(null));
 
-		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
-
 		// Act
-		var resultado = await tarefaService.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate);
+		var resultado = await TarefaServiceMock.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate);
 
 		// Assert
 		resultado.Should().NotBeNull();
@@ -125,40 +73,19 @@ public class AtualizaTarefaServiceTests : BaseServiceSetup
 	public async Task DeveRetornar_403Forbidden_QuandoUserIdInvalido()
 	{
 		// Arrange
-		var userId = Guid.NewGuid().ToString();
-		var tarefaId = Guid.NewGuid();
+		var userId = MocksData.User.GetUserId();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
-		var claims = new[]
-		{
-			new Claim("UserId", userId)
-		};
+		var claimsPrincipal = MocksData.User.GetClaimsPrincipal(userId);
 
-		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+		var tarefaRequestUpdate = MocksData.Tarefa.GetTarefaRequestUpdateDTO();
 
-		var tarefaRequestUpdate = new TarefaRequestUpdateDTO
-		{
-			Titulo = "Tarefa Atualizada",
-			Descricao = "Descrição atualizada",
-			Data_vencimento = DateTime.Now.AddDays(3),
-			Status = true
-		};
-
-		var tarefaExistente = new Tarefa
-		{
-			Id = tarefaId,
-			Titulo = "Tarefa Existente",
-			Descricao = "Descrição da tarefa existente",
-			Data_vencimento = DateTime.Now.AddDays(2),
-			Status = false,
-			Usuario_id = Guid.NewGuid().ToString()
-		};
+		var tarefaExistente = MocksData.Tarefa.GetTarefa(tarefaId, Guid.NewGuid().ToString());
 
 		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(tarefaExistente);
 
-		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
-
 		// Act
-		var resultado = await tarefaService.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate);
+		var resultado = await TarefaServiceMock.AtualizaTarefa(claimsPrincipal, tarefaId, tarefaRequestUpdate);
 
 		// Assert
 		resultado.Should().NotBeNull();

@@ -1,48 +1,31 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
-using System.Security.Claims;
 using Taskfy.API.Models;
-using Taskfy.API.Services.Tarefas;
+using Taskfy.Tests.Unit.ServicesMocks;
 using Taskfy.Tests.Unit.Tarefas.Services.Mocks;
 
 namespace Taskfy.Tests.Unit.Tarefas.Services;
 
-public class DeletaTarefaServiceTests : BaseServiceSetup
+public class DeletaTarefaServiceTests : BaseTarefaServiceSetup
 {
 	[Fact]
 	public async Task DeveRetornar_200OK_QuandoDeletarTarefa()
 	{
 		// Arrange
-		var userId = Guid.NewGuid().ToString();
-		var tarefaId = Guid.NewGuid();
+		var userId = MocksData.User.GetUserId();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
-		var claims = new[]
-		{
-			new Claim("UserId", userId)
-		};
+		var claimsPrincipal = MocksData.User.GetClaimsPrincipal(userId);
 
-		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
-
-		var tarefaExistente = new Tarefa
-		{
-			Id = tarefaId,
-			Titulo = "Tarefa Existente",
-			Descricao = "Descrição da tarefa existente",
-			Data_vencimento = DateTime.Now.AddDays(2),
-			Usuario = null,
-			Status = false,
-			Usuario_id = userId
-		};
+		var tarefaExistente = MocksData.Tarefa.GetTarefa(tarefaId, userId);
 
 		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(tarefaExistente);
 		UnitOfWorkMock.TarefaRepository.Delete(tarefaExistente).Returns(tarefaExistente);
 		UnitOfWorkMock.CommitAsync().Returns(Task.CompletedTask);
 
-		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
-
 		// Act
-		var resultado = await tarefaService.DeletaTarefa(claimsPrincipal, tarefaId);
+		var resultado = await TarefaServiceMock.DeletaTarefa(claimsPrincipal, tarefaId);
 
 		// Assert
 		resultado.Should().NotBeNull();
@@ -58,22 +41,15 @@ public class DeletaTarefaServiceTests : BaseServiceSetup
 	public async Task DeveRetornar_404NotFound_QuandoTarefaNaoEncontrada()
 	{
 		// Arrange
-		var userId = Guid.NewGuid().ToString();
-		var tarefaId = Guid.NewGuid();
+		var userId = MocksData.User.GetUserId();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
-		var claims = new[]
-		{
-			new Claim("UserId", userId)
-		};
-
-		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+		var claimsPrincipal = MocksData.User.GetClaimsPrincipal(userId);
 
 		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(Task.FromResult<Tarefa?>(null));
 
-		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
-
 		// Act
-		var resultado = await tarefaService.DeletaTarefa(claimsPrincipal, tarefaId);
+		var resultado = await TarefaServiceMock.DeletaTarefa(claimsPrincipal, tarefaId);
 
 		// Assert
 		resultado.Should().NotBeNull();
@@ -86,33 +62,17 @@ public class DeletaTarefaServiceTests : BaseServiceSetup
 	public async Task DeveRetornar_403Forbidden_QuandoUserIdInvalido()
 	{
 		// Arrange
-		var userId = Guid.NewGuid().ToString();
-		var tarefaId = Guid.NewGuid();
+		var userId = MocksData.User.GetUserId();
+		var tarefaId = MocksData.Tarefa.GetTarefaId();
 
-		var claims = new[]
-		{
-			new Claim("UserId", userId)
-		};
+		var claimsPrincipal = MocksData.User.GetClaimsPrincipal(userId);
 
-		var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
-
-		var tarefaExistente = new Tarefa
-		{
-			Id = tarefaId,
-			Titulo = "Tarefa Existente",
-			Descricao = "Descrição da tarefa existente",
-			Data_vencimento = DateTime.Now.AddDays(2),
-			Usuario = null,
-			Status = false,
-			Usuario_id = Guid.NewGuid().ToString()
-		};
+		var tarefaExistente = MocksData.Tarefa.GetTarefa(tarefaId, Guid.NewGuid().ToString());
 
 		UnitOfWorkMock.TarefaRepository.FindAsync(tarefaId).Returns(tarefaExistente);
 
-		var tarefaService = new TarefaService(UnitOfWorkMock, LoggerMock, MapperMock);
-
 		// Act
-		var resultado = await tarefaService.DeletaTarefa(claimsPrincipal, tarefaId);
+		var resultado = await TarefaServiceMock.DeletaTarefa(claimsPrincipal, tarefaId);
 
 		// Assert
 		resultado.Should().NotBeNull();

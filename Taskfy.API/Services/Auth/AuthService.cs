@@ -6,6 +6,7 @@ using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
 using Taskfy.API.Logs;
 using Taskfy.API.Models;
+using Taskfy.API.Services.MessagesQueue;
 
 namespace Taskfy.API.Services.Auth;
 
@@ -15,13 +16,15 @@ public class AuthService : IAuthService
 	private readonly IConfiguration _configuration;
 	private readonly ITokenService _tokenService;
 	private readonly ILog _logger;
+	private readonly IMessageQueueService _messageQueueService;
 
-	public AuthService(UserManager<Usuario> userManager, IConfiguration configuration, ITokenService tokenService, ILog logger)
+	public AuthService(UserManager<Usuario> userManager, IConfiguration configuration, ITokenService tokenService, ILog logger, IMessageQueueService messageQueueService)
 	{
 		_userManager = userManager;
 		_configuration = configuration;
 		_tokenService = tokenService;
 		_logger = logger;
+		_messageQueueService = messageQueueService;
 	}
 
 	public async Task<ResponseDTO> RegisterAsync(RegistroModelDTO usuarioModel)
@@ -44,6 +47,8 @@ public class AuthService : IAuthService
 
 		if (registraUsuario.Succeeded)
 		{
+			_messageQueueService.PublishUserCreated(usuario.Name, usuario.Email);
+
 			return new ResponseDTO
 			{
 				Status = "Sucesso",
@@ -119,8 +124,6 @@ public class AuthService : IAuthService
 
 		var authClaims = new List<Claim>
 	{
-		new Claim(ClaimTypes.Name, usuario.Name),
-		new Claim(ClaimTypes.Email, usuario.Email!),
 		new Claim("UserId", usuario.Id),
 		new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 	};

@@ -2,24 +2,20 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
-using Taskfy.API.Controllers;
 using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
-using Taskfy.API.Services.Auth;
+using Taskfy.Tests.Unit.Auth.Controllers.BaseMocks;
+using Taskfy.Tests.Unit.ServicesMocks;
 
 namespace Taskfy.Tests.Unit.Auth.Controllers;
 
-public class LoginControllerTests
+public class LoginControllerTests : BaseAuthControllerSetup
 {
 	[Fact]
-	public async Task Verifica_LoginComSucesso_Retorna201CreatedStatusCode()
+	public async Task DeveRetornar_200OK_QuandoLoginComSucesso()
 	{
 		// Arrange
-		var usuarioModel = new LoginModelDTO
-		{
-			Email = "test@gmail.com",
-			Password = "Test123@"
-		};
+		var loginRequestDto = MocksData.User.GetLoginRequestDTO();
 
 		var responseToken = new ResponseLoginTokenDTO
 		{
@@ -29,13 +25,10 @@ public class LoginControllerTests
 			Expiration = DateTime.UtcNow.AddMinutes(30)
 		};
 
-		var authService = Substitute.For<IAuthService>();
-		authService.LoginAsync(usuarioModel).Returns(Task.FromResult(responseToken as ResponseDTO));
-
-		var controller = new AuthController(authService);
+		AuthServiceMock.LoginAsync(loginRequestDto).Returns(Task.FromResult(responseToken as ResponseDTO));
 
 		// Act
-		var resultado = await controller.Login(usuarioModel) as ObjectResult;
+		var resultado = await AuthControllerMock.Login(loginRequestDto) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();
@@ -44,14 +37,10 @@ public class LoginControllerTests
 	}
 
 	[Fact]
-	public async Task Verifica_401Unauthorized_QuandoCredenciaisInvalidas()
+	public async Task DeveRetornar_401Unauthorized_QuandoCredenciaisInvalidas()
 	{
 		// Arrange
-		var usuarioModel = new LoginModelDTO
-		{
-			Email = "test@gmail.com",
-			Password = "Test123@"
-		};
+		var loginRequestDto = MocksData.User.GetLoginRequestDTO();
 
 		var response = new ResponseDTO
 		{
@@ -60,13 +49,10 @@ public class LoginControllerTests
 			StatusCode = StatusCodes.Status401Unauthorized
 		};
 
-		var authService = Substitute.For<IAuthService>();
-		authService.LoginAsync(usuarioModel).Returns(Task.FromResult(response));
-
-		var controller = new AuthController(authService);
+		AuthServiceMock.LoginAsync(loginRequestDto).Returns(Task.FromResult(response));
 
 		// Act
-		var resultado = await controller.Login(usuarioModel) as ObjectResult;
+		var resultado = await AuthControllerMock.Login(loginRequestDto) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();
@@ -75,14 +61,10 @@ public class LoginControllerTests
 	}
 
 	[Fact]
-	public async Task Verifica_500ErroInterno_QuandoFalhaAoAtualizarRefreshToken()
+	public async Task DeveRetornar_Erro500_QuandoFalhaAoAtualizarRefreshToken()
 	{
 		// Arrange
-		var usuarioModel = new LoginModelDTO
-		{
-			Email = "test@gmail.com",
-			Password = "Test123@"
-		};
+		var loginRequestDto = MocksData.User.GetLoginRequestDTO();
 
 		var response = new ResponseDTO
 		{
@@ -91,13 +73,10 @@ public class LoginControllerTests
 			StatusCode = StatusCodes.Status500InternalServerError
 		};
 
-		var authService = Substitute.For<IAuthService>();
-		authService.LoginAsync(usuarioModel).Returns(Task.FromResult(response));
-
-		var controller = new AuthController(authService);
+		AuthServiceMock.LoginAsync(loginRequestDto).Returns(Task.FromResult(response));
 
 		// Act
-		var resultado = await controller.Login(usuarioModel) as ObjectResult;
+		var resultado = await AuthControllerMock.Login(loginRequestDto) as ObjectResult;
 
 		// Assert
 		resultado.Should().NotBeNull();

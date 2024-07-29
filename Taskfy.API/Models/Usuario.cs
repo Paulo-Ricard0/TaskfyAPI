@@ -8,7 +8,7 @@ public class Usuario : IdentityUser
 {
 	[Required]
 	[StringLength(100)]
-	public string Name { get; set; } = string.Empty;
+	public required string Name { get; set; }
 	public string? RefreshToken { get; set; }
 	public DateTime RefreshTokenExpiryTime { get; set; }
 

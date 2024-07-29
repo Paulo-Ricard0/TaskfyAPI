@@ -2,62 +2,42 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using Taskfy.API.DTOs;
 using Taskfy.API.DTOs.Usuario;
-using Taskfy.API.Logs;
 using Taskfy.API.Models;
-using Taskfy.API.Services.Auth;
+using Taskfy.Tests.Unit.Auth.Services.Mocks;
+using Taskfy.Tests.Unit.ServicesMocks;
 
 namespace Taskfy.Tests.Unit.Auth.Services
 {
-	public class LoginServiceTests
+	public class LoginServiceTests : BaseUserServiceSetup
 	{
 		[Fact]
-		public async Task DeveRetornarSucesso_QuandoUsuarioExistirComSenhaCorreta()
+		public async Task DeveRetornar_200OK_QuandoUsuarioEsenhaCorretos()
 		{
 			// Arrange
-			var usuarioModel = new LoginModelDTO
-			{
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			var loginRequestModel = MocksData.User.GetLoginRequestDTO();
 
-			var usuario = new Usuario
-			{
-				Name = "testuser test",
-				Email = "test@gmail.com",
-			};
+			var usuario = MocksData.User.GetUsuario();
 
-			var userManager = Substitute.For<UserManager<Usuario>>(
-				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
+			UserManagerMock.FindByEmailAsync(loginRequestModel.Email).Returns(Task.FromResult<Usuario?>(usuario));
+			UserManagerMock.CheckPasswordAsync(usuario, loginRequestModel.Password).Returns(Task.FromResult(true));
+			UserManagerMock.GetRolesAsync(usuario).Returns(Task.FromResult<IList<string>>([]));
+			UserManagerMock.UpdateAsync(usuario).Returns(Task.FromResult(IdentityResult.Success));
 
-			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(usuario));
-			userManager.CheckPasswordAsync(usuario, usuarioModel.Password).Returns(Task.FromResult(true));
-			userManager.GetRolesAsync(usuario).Returns(Task.FromResult<IList<string>>(new List<string>()));
-			userManager.UpdateAsync(usuario).Returns(Task.FromResult(IdentityResult.Success));
+			ConfigurationMock["JWT:SecretKey"].Returns("7b4093b95b3c848b3d3b961da2203c848a09093d");
+			ConfigurationMock["JWT:ValidAudience"].Returns("http://localhost:7066");
+			ConfigurationMock["JWT:ValidIssuer"].Returns("http://localhost:5066");
+			ConfigurationMock["JWT:TokenValidityInMinutes"].Returns("30");
+			ConfigurationMock["JWT:RefreshTokenValidityInMinutes"].Returns("60");
 
-			var configuration = Substitute.For<IConfiguration>();
-			configuration["JWT:SecretKey"].Returns("7b4093b95b3c848b3d3b961da2203c848a09093d");
-			configuration["JWT:ValidAudience"].Returns("http://localhost:7066");
-			configuration["JWT:ValidIssuer"].Returns("http://localhost:5066");
-			configuration["JWT:TokenValidityInMinutes"].Returns("30");
-			configuration["JWT:RefreshTokenValidityInMinutes"].Returns("60");
-
-			var mockTokenService = Substitute.For<ITokenService>();
-			mockTokenService.GenerateAccessToken(Arg.Any<IEnumerable<Claim>>(), Arg.Any<IConfiguration>())
-				.Returns(CreateMockJwtToken());
-
-			var mockLogger = Substitute.For<ILog>();
-
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			TokenServiceMock.GenerateAccessToken(Arg.Any<IEnumerable<Claim>>(), Arg.Any<IConfiguration>())
+				.Returns(MocksData.Auth.GetJwtToken(usuario.Id));
 
 			// Act
-			var resultado = await authService.LoginAsync(usuarioModel) as ResponseLoginTokenDTO;
+			var resultado = await AuthServiceMock.LoginAsync(loginRequestModel) as ResponseLoginTokenDTO;
 
 			// Assert
 			resultado.Should().NotBeNull();
@@ -68,57 +48,21 @@ namespace Taskfy.Tests.Unit.Auth.Services
 			const int maxTokenValidityInMinutes = 35;
 			var maxExpiration = DateTime.UtcNow.AddMinutes(maxTokenValidityInMinutes);
 			resultado?.Expiration.Should().BeAfter(DateTime.UtcNow).And.BeBefore(maxExpiration);
-			;
-		}
-
-		private static JwtSecurityToken CreateMockJwtToken()
-		{
-			var tokenHandler = new JwtSecurityTokenHandler();
-			var tokenDescriptor = new SecurityTokenDescriptor
-			{
-				Subject = new ClaimsIdentity(new[]
-				{
-					new Claim(ClaimTypes.Name, "testuser"),
-					new Claim(ClaimTypes.Email, "test@gmail.com")
-				}),
-				Expires = DateTime.UtcNow.AddMinutes(30),
-				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("7b4093b95b3c848a3c3b961da2203c848a09093c")), SecurityAlgorithms.HmacSha256Signature)
-			};
-
-			var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
-			return token;
 		}
 
 		[Fact]
-		public async Task DeveRetornar401Unauthorized_QuandoCredenciaisInvalidas()
+		public async Task DeveRetornar_401Unauthorized_QuandoCredenciaisInvalidas()
 		{
 			// Arrange
-			var usuarioModel = new LoginModelDTO
-			{
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			var loginRequestModel = MocksData.User.GetLoginRequestDTO();
 
-			var usuario = new Usuario
-			{
-				Name = "testuser",
-				Email = "test@gmail.com",
-			};
+			var usuario = MocksData.User.GetUsuario();
 
-			var userManager = Substitute.For<UserManager<Usuario>>(
-				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
-
-			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(null));
-			userManager.CheckPasswordAsync(usuario, usuarioModel.Password).Returns(Task.FromResult(false));
-
-			var configuration = Substitute.For<IConfiguration>();
-			var mockTokenService = Substitute.For<ITokenService>();
-			var mockLogger = Substitute.For<ILog>();
-
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			UserManagerMock.FindByEmailAsync(loginRequestModel.Email).Returns(Task.FromResult<Usuario?>(null));
+			UserManagerMock.CheckPasswordAsync(usuario, loginRequestModel.Password).Returns(Task.FromResult(false));
 
 			// Act
-			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
+			var resultado = await AuthServiceMock.LoginAsync(loginRequestModel) as ResponseDTO;
 
 			// Assert
 			resultado.Should().NotBeNull();
@@ -128,38 +72,21 @@ namespace Taskfy.Tests.Unit.Auth.Services
 		}
 
 		[Fact]
-		public async Task DeveRetornarErro500_EmFalha_AoAtualizarRefreshToken()
+		public async Task DeveRetornar_Erro500_EmFalha_AoAtualizarRefreshToken()
 		{
 			// Arrange
-			var usuarioModel = new LoginModelDTO
-			{
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			var loginRequestModel = MocksData.User.GetLoginRequestDTO();
 
-			var usuario = new Usuario
-			{
-				Name = "testuser",
-				Email = "test@gmail.com",
-			};
+			var usuario = MocksData.User.GetUsuario();
 
-			var userManager = Substitute.For<UserManager<Usuario>>(
-				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
+			UserManagerMock.FindByEmailAsync(loginRequestModel.Email).Returns(Task.FromResult<Usuario?>(usuario));
+			UserManagerMock.CheckPasswordAsync(usuario, loginRequestModel.Password).Returns(Task.FromResult(true));
+			UserManagerMock.UpdateAsync(usuario).Returns(Task.FromResult(IdentityResult.Failed()));
 
-			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(usuario));
-			userManager.CheckPasswordAsync(usuario, usuarioModel.Password).Returns(Task.FromResult(true));
-			userManager.UpdateAsync(usuario).Returns(Task.FromResult(IdentityResult.Failed()));
-
-			var configuration = Substitute.For<IConfiguration>();
-			configuration["JWT:RefreshTokenValidityInMinutes"].Returns("60");
-
-			var mockTokenService = Substitute.For<ITokenService>();
-			var mockLogger = Substitute.For<ILog>();
-
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			ConfigurationMock["JWT:RefreshTokenValidityInMinutes"].Returns("60");
 
 			// Act
-			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
+			var resultado = await AuthServiceMock.LoginAsync(loginRequestModel) as ResponseDTO;
 
 			// Assert
 			resultado.Should().NotBeNull();
@@ -169,37 +96,20 @@ namespace Taskfy.Tests.Unit.Auth.Services
 		}
 
 		[Fact]
-		public async Task DeveRetornarErro500_EmFalha_AoParsearRefreshTokenValidityInMinutes()
+		public async Task DeveRetornar_Erro500_EmFalha_AoParsearRefreshTokenValidityInMinutes()
 		{
 			// Arrange
-			var usuarioModel = new LoginModelDTO
-			{
-				Email = "test@gmail.com",
-				Password = "Test123@"
-			};
+			var loginRequestModel = MocksData.User.GetLoginRequestDTO();
 
-			var usuario = new Usuario
-			{
-				Name = "testuser",
-				Email = "test@gmail.com",
-			};
+			var usuario = MocksData.User.GetUsuario();
 
-			var userManager = Substitute.For<UserManager<Usuario>>(
-				Substitute.For<IUserStore<Usuario>>(), null, null, null, null, null, null, null, null);
+			UserManagerMock.FindByEmailAsync(loginRequestModel.Email).Returns(Task.FromResult<Usuario?>(usuario));
+			UserManagerMock.CheckPasswordAsync(usuario, loginRequestModel.Password).Returns(Task.FromResult(true));
 
-			userManager.FindByEmailAsync(usuarioModel.Email).Returns(Task.FromResult<Usuario?>(usuario));
-			userManager.CheckPasswordAsync(usuario, usuarioModel.Password).Returns(Task.FromResult(true));
-
-			var configuration = Substitute.For<IConfiguration>();
-			configuration["JWT:RefreshTokenValidityInMinutes"].Returns("invalid_value");
-
-			var mockTokenService = Substitute.For<ITokenService>();
-			var mockLogger = Substitute.For<ILog>();
-
-			var authService = new AuthService(userManager, configuration, mockTokenService, mockLogger);
+			ConfigurationMock["JWT:RefreshTokenValidityInMinutes"].Returns("invalid_value");
 
 			// Act
-			var resultado = await authService.LoginAsync(usuarioModel) as ResponseDTO;
+			var resultado = await AuthServiceMock.LoginAsync(loginRequestModel) as ResponseDTO;
 
 			// Assert
 			resultado.Should().NotBeNull();

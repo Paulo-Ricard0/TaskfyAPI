@@ -2,5 +2,5 @@
 
 public class GlobalErrorResponseDTO : ResponseDTO
 {
-	public string Error { get; set; } = string.Empty;
+	public required string Error { get; set; }
 }
