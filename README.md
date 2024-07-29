@@ -114,10 +114,38 @@ sequenceDiagram
 - **Registro de Usuário**: Permite que novos usuários se registrem na aplicação utilizando nome de usuário, e-mail e senha.
 - **Login de Usuário**: Autentica com e-mail e senha usuários já registrados.
 - **CRUD de Tarefas**: Permite que usuários criem, busquem, atualizem e excluam suas tarefas.
+- **Envio de e-mails**: Envia e-mails de notificação para o usuário.
 - **Middleware Global de Erros**: Captura e trata erros, fornecendo respostas adequadas ao cliente e registrando logs.
 - **Sistema de Logs**: Monitora e registra erros e eventos importantes na aplicação.
 
 ---
+
+## ✉️ Fluxo de mensageria
+
+```mermaid
+flowchart TD
+    A[Usuario] --> |Realiza uma ação| B[Taskfy.API]
+    B --> C[Publica uma notificação no RabbitMQ]
+    C --> D[Exchange]
+    D --> E[taskfy_notification_queue]
+    E --> |Consome a fila| F[Taskfy.NotificationService]
+    F --> |Cria o template de email e publica na fila| G[Exchange]
+    G --> H[taskfy_email_queue]
+    H --> |Consome a fila| I[Taskfy.EmailService]
+    I --> |Envia e-mail| J[Destinatário]
+    
+    subgraph RabbitMQ_______________
+        D
+        E
+        G
+        H
+    end
+    
+    subgraph Serviços
+        F
+        I
+    end                                                
+```
 
 ## 🧪 Testes
 A aplicação inclui uma suíte de testes unitários utilizando o xUnit, cobrindo todos os casos relevantes nos controllers e services de usuários e tarefas.
@@ -137,6 +165,10 @@ A aplicação inclui uma suíte de testes unitários utilizando o xUnit, cobrind
 - JWT
 - AutoMapper
 - Swagger
+
+### Mensageria e envio de e-mails:
+- RabbitMQ
+- MailKit
 
 ### Banco de dados:
 - SQL Server
