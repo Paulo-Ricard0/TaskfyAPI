@@ -152,7 +152,7 @@ A aplicação inclui uma suíte de testes unitários utilizando o xUnit, cobrind
 - **Total de Testes**: 41
 - **Cobertura**: Controllers e Services de Usuários e Tarefas
 
-<img alt="Imagem com testes unitarios" title="testes unitarios" src="https://camo.githubusercontent.com/3711b3cbdd3c53028d3a712f6800577198bd30aeaeb69198e03722fab7f3edec/68747470733a2f2f666972656261736573746f726167652e676f6f676c65617069732e636f6d2f76302f622f75706c6f6164732d35386562632e61707073706f742e636f6d2f6f2f43617074757261253230646525323074656c61253230323032342d30362d31372532303030343134342e706e673f616c743d6d6564696126746f6b656e3d35613937353135622d316530642d343438392d393235622d303766323330626139356263" />
+<img alt="Imagem com testes unitarios" title="testes unitarios" src="https://firebasestorage.googleapis.com/v0/b/uploads-58ebc.appspot.com/o/Captura%20de%20tela%202024-06-17%20004144.png?alt=media&token=5a97515b-1e0d-4489-925b-07f230ba95bc" />
 
 ---
 
